@@ -1,5 +1,5 @@
 // Service Worker - 缓存静态资源，离线可用
-const CACHE = 'workbench-v4';
+const CACHE = 'workbench-v5';
 const ASSETS = ['./', './index.html', './manifest.json', './icon-192.png', './icon-512.png'];
 
 self.addEventListener('install', (e) => {
