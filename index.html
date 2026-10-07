@@ -3,22 +3,22 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<meta name="theme-color" content="#ff6b81">
+<meta name="theme-color" content="#a78bfa">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="apple-mobile-web-app-title" content="工作台">
 <link rel="manifest" href="manifest.json">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <link rel="icon" type="image/png" href="icon-192.png">
-<title>我的小工作台</title>
+<title>静静的工作台</title>
 <style>
-:root{--bg:#fff5f7;--card:#fff;--text:#5a3d44;--sub:#9d8189;--line:#ffd6e0;--primary:#ff8fa3;--primary-light:#ffe4eb;--success:#ff9eb5;--danger:#ff6b81;--warn:#ffc75f;--radius:22px;--shadow:0 4px 14px rgba(255,143,163,.12)}
+:root{--bg:#14101f;--card:#221a33;--text:#e8e2f5;--sub:#9d8fc0;--line:#3a2d55;--primary:#a78bfa;--primary-light:#2d2344;--success:#c084fc;--danger:#f472b6;--warn:#fbbf24;--radius:22px;--shadow:0 4px 18px rgba(167,139,250,.18)}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei","Hiragino Sans GB",sans-serif;background:var(--bg);background-image:radial-gradient(#ffe4eb 1px,transparent 1px);background-size:24px 24px;color:var(--text);line-height:1.6;font-size:15px;padding:0 0 80px}
+body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei","Hiragino Sans GB",sans-serif;background:var(--bg);background-image:radial-gradient(#3a2d55 1px,transparent 1px);background-size:24px 24px;color:var(--text);line-height:1.6;font-size:15px;padding:0 0 80px}
 .container{max-width:480px;margin:0 auto;padding:14px 16px 10px;position:relative;z-index:1}
 header{display:flex;align-items:center;gap:8px;margin-bottom:6px}
-header h1{margin:0;font-size:20px;color:#ff6b81;letter-spacing:.5px}
-header .date{font-size:11px;color:var(--sub);background:#fff;border:1px solid var(--line);padding:4px 8px;border-radius:16px}
+header h1{margin:0;font-size:20px;color:#a78bfa;letter-spacing:.5px}
+header .date{font-size:11px;color:var(--sub);background:#221a33;border:1px solid var(--line);padding:4px 8px;border-radius:16px}
 .greet{font-size:13px;color:var(--sub);margin-bottom:12px;padding-left:2px}
 
 /* Panel 容器 */
@@ -26,132 +26,132 @@ header .date{font-size:11px;color:var(--sub);background:#fff;border:1px solid va
 .panel.active{display:block}
 .panel-scroll{max-height:calc(100vh - 200px);overflow-y:auto;-webkit-overflow-scrolling:touch}
 
-.card{background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);padding:14px 16px;margin-bottom:12px;border:1px solid #fff0f3;position:relative;overflow:hidden}
-.card::before{content:"";position:absolute;top:-20px;right:-20px;width:60px;height:60px;background:radial-gradient(circle,rgba(255,143,163,.12),transparent 70%);border-radius:50%}
-.card-title{font-size:15px;font-weight:700;margin:0 0 10px;display:flex;align-items:center;gap:8px;color:#ff6b81}
+.card{background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);padding:14px 16px;margin-bottom:12px;border:1px solid #2d2344;position:relative;overflow:hidden}
+.card::before{content:"";position:absolute;top:-20px;right:-20px;width:60px;height:60px;background:radial-gradient(circle,rgba(167,139,250,.12),transparent 70%);border-radius:50%}
+.card-title{font-size:15px;font-weight:700;margin:0 0 10px;display:flex;align-items:center;gap:8px;color:#a78bfa}
 .card-title .ci{font-size:18px;background:var(--primary-light);width:30px;height:30px;display:flex;align-items:center;justify-content:center;border-radius:50%}
 .divider{height:1px;background:var(--line);margin:12px 0;border-radius:1px}
 
 /* 任务 tab */
 .todo-tabs{display:flex;gap:6px;overflow-x:auto;padding-bottom:4px;margin-bottom:10px}
 .todo-tabs::-webkit-scrollbar{display:none}
-.ttab{flex:1;min-width:56px;text-align:center;padding:7px 0;border-radius:20px;background:#fff0f3;font-size:11px;color:var(--sub);border:none;white-space:nowrap;box-shadow:0 2px 4px rgba(255,143,163,.06)}
-.ttab.on{background:linear-gradient(135deg,#ff8fa3,#ff6b81);color:#fff;box-shadow:0 3px 8px rgba(255,107,129,.2)}
+.ttab{flex:1;min-width:56px;text-align:center;padding:7px 0;border-radius:20px;background:#2d2344;font-size:11px;color:var(--sub);border:none;white-space:nowrap;box-shadow:0 2px 4px rgba(167,139,250,.06)}
+.ttab.on{background:linear-gradient(135deg,#c084fc,#a78bfa);color:#1a1428;font-weight:700;box-shadow:0 3px 8px rgba(139,92,246,.3)}
 .todo-list{list-style:none;margin:0;padding:0}
-.ti{display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px dashed #ffe4eb}
+.ti{display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px dashed #3a2d55}
 .ti:last-child{border-bottom:none}
-.ti input[type=checkbox]{width:18px;height:18px;accent-color:#ff6b81;flex-shrink:0}
+.ti input[type=checkbox]{width:18px;height:18px;accent-color:#a78bfa;flex-shrink:0}
 .ti span{flex:1;font-size:13px}
 .ti span.done{text-decoration:line-through;color:var(--sub);opacity:.7}
-.ti .del{color:var(--danger);font-size:11px;cursor:pointer;background:#fff0f2;padding:2px 7px;border-radius:10px}
+.ti .del{color:var(--danger);font-size:11px;cursor:pointer;background:#221a330f2;padding:2px 7px;border-radius:10px}
 .add-row{display:flex;gap:8px;margin-top:10px}
-.add-row input{flex:1;border:1px solid var(--line);border-radius:12px;padding:9px 12px;font-size:13px;outline:none;background:#fffafa}
-.add-row input:focus{border-color:#ff8fa3}
-.btn{padding:8px 14px;border-radius:12px;border:none;background:linear-gradient(135deg,#ff8fa3,#ff6b81);color:#fff;font-size:13px;cursor:pointer;white-space:nowrap;box-shadow:0 3px 8px rgba(255,107,129,.15)}
-.btn.ghost{background:#fff0f3;color:#ff6b81;box-shadow:none}
+.add-row input{flex:1;border:1px solid var(--line);border-radius:12px;padding:9px 12px;font-size:13px;outline:none;background:#1c1630}
+.add-row input:focus{border-color:#c084fc}
+.btn{padding:8px 14px;border-radius:12px;border:none;background:linear-gradient(135deg,#c084fc,#a78bfa);color:#1a1428;font-weight:600;font-size:13px;cursor:pointer;white-space:nowrap;box-shadow:0 3px 8px rgba(139,92,246,.15)}
+.btn.ghost{background:#2d2344;color:#a78bfa;box-shadow:none}
 .btn.sm{padding:5px 10px;font-size:11px}
 .btn.wide{display:block;width:100%;text-align:center;margin-top:8px}
 .stats{display:flex;gap:6px;justify-content:space-between;margin-top:10px}
-.stat{flex:1;text-align:center;background:linear-gradient(180deg,#fff0f3,#fff);border-radius:14px;padding:10px 2px;border:1px solid #ffe4eb}
-.stat .num{font-size:16px;font-weight:700;color:#ff6b81}
+.stat{flex:1;text-align:center;background:linear-gradient(180deg,#2d2344,#221a33);border-radius:14px;padding:10px 2px;border:1px solid #3a2d55}
+.stat .num{font-size:16px;font-weight:700;color:#a78bfa}
 .stat .label{font-size:10px;color:var(--sub);margin-top:2px}
 
 /* 资讯列表 */
-.info-item{padding:11px 0;border-bottom:1px dashed #ffe4eb}
+.info-item{padding:11px 0;border-bottom:1px dashed #3a2d55}
 .info-item:last-child{border-bottom:none}
 .tag{display:inline-block;font-size:10px;padding:2px 8px;border-radius:14px;margin-right:5px;font-weight:600}
-.tag.risk{background:#ffe4e6;color:#e11d48}.tag.tip{background:#e0f7fa;color:#0891b2}.tag.new{background:#ede9fe;color:#7c3aed}.tag.kw{background:#fff3e0;color:#d97706}.tag.goal{background:#d1fae5;color:#047857}
-.item-title{font-size:14px;font-weight:600;margin-bottom:5px;color:#5a3d44}
+.tag.risk{background:#3b1d33;color:#f9a8d4}.tag.tip{background:#14313a;color:#5eead4}.tag.new{background:#2d2344;color:#c084fc}.tag.kw{background:#3a2d1a;color:#fbbf24}.tag.goal{background:#14321f;color:#4ade80}.tag.data{background:#1a2d4a;color:#60a5fa}.tag.case{background:#3a2344;color:#e879f9}
+.item-title{font-size:14px;font-weight:600;margin-bottom:5px;color:#e8e2f5}
 .item-body{font-size:13px;color:var(--sub);line-height:1.75}
 .item-body ul{margin:4px 0 0 16px;padding:0}
 .item-body li{margin-bottom:2px}
-.bullets{margin-top:6px;padding:6px 10px;background:#fafafa;border-radius:10px;font-size:12px;color:var(--sub)}
+.bullets{margin-top:6px;padding:6px 10px;background:#251d38;border-radius:10px;font-size:12px;color:var(--sub)}
 
 /* 健康 */
-.check-btn{display:inline-flex;align-items:center;gap:6px;padding:8px 14px;border-radius:20px;border:1px solid #ffd6e0;background:#fff;font-size:13px;cursor:pointer;color:#5a3d44;box-shadow:0 2px 6px rgba(255,143,163,.08)}
-.check-btn.on{background:linear-gradient(135deg,#ff9eb5,#ff8fa3);color:#fff;border-color:transparent}
+.check-btn{display:inline-flex;align-items:center;gap:6px;padding:8px 14px;border-radius:20px;border:1px solid #3a2d55;background:#221a33;font-size:13px;cursor:pointer;color:#e8e2f5;box-shadow:0 2px 6px rgba(167,139,250,.08)}
+.check-btn.on{background:linear-gradient(135deg,#d8b4fe,#c084fc);color:#1a1428;border-color:transparent}
 .food-list{display:flex;flex-wrap:wrap;gap:6px;margin:10px 0}
-.fchip{background:#fff0f3;padding:5px 10px;border-radius:14px;font-size:11px;display:flex;align-items:center;gap:4px;color:#8b5c66;border:1px solid #ffe4eb}
-.fchip button{border:none;background:#ffe4eb;color:#ff6b81;font-size:12px;cursor:pointer;width:16px;height:16px;border-radius:50%;display:flex;align-items:center;justify-content:center;padding:0}
-.cal-box{text-align:center;padding:14px;background:linear-gradient(135deg,#fff0f3,#fff);border-radius:16px;margin-top:10px;border:1px solid #ffe4eb}
-.cal-box .num{font-size:22px;font-weight:700;color:#ff6b81}
+.fchip{background:#2d2344;padding:5px 10px;border-radius:14px;font-size:11px;display:flex;align-items:center;gap:4px;color:#a898c8;border:1px solid #3a2d55}
+.fchip button{border:none;background:#3a2d55;color:#a78bfa;font-size:12px;cursor:pointer;width:16px;height:16px;border-radius:50%;display:flex;align-items:center;justify-content:center;padding:0}
+.cal-box{text-align:center;padding:14px;background:linear-gradient(135deg,#2d2344,#221a33);border-radius:16px;margin-top:10px;border:1px solid #3a2d55}
+.cal-box .num{font-size:22px;font-weight:700;color:#a78bfa}
 .cal-box .label{font-size:11px;color:var(--sub)}
 
 /* 英语 */
-.eng-box{background:#fff0f3;border-radius:14px;padding:12px;margin:8px 0;border:1px solid #ffe4eb}
-.eng-en{font-size:15px;font-weight:600;color:#ff6b81;margin-bottom:5px}
+.eng-box{background:#2d2344;border-radius:14px;padding:12px;margin:8px 0;border:1px solid #3a2d55}
+.eng-en{font-size:15px;font-weight:600;color:#a78bfa;margin-bottom:5px}
 .eng-cn{font-size:12px;color:var(--sub)}
 
 /* 书摘 */
-.quote{font-style:italic;color:#7a4f5a;padding:14px;border-left:4px solid #ff8fa3;background:linear-gradient(90deg,#fff0f3,#fff);border-radius:0 16px 16px 0;line-height:1.8}
-.quote-src{text-align:right;font-size:11px;color:#ff8fa3;margin-top:6px}
+.quote{font-style:italic;color:#c4b5e0;padding:14px;border-left:4px solid #c084fc;background:linear-gradient(90deg,#2d2344,#221a33);border-radius:0 16px 16px 0;line-height:1.8}
+.quote-src{text-align:right;font-size:11px;color:#c084fc;margin-top:6px}
 
 /* 日记 */
-.diary-area{width:100%;min-height:120px;border:1px solid #ffd6e0;border-radius:14px;padding:12px;font-size:14px;outline:none;background:#fffafa;resize:vertical;font-family:inherit;line-height:1.7}
-.diary-area:focus{border-color:#ff8fa3;background:#fff}
-.diary-entry{background:#fff0f3;border-radius:12px;padding:10px 12px;margin-bottom:8px;border:1px solid #ffe4eb}
-.diary-entry .dh{font-size:11px;color:#ff8fa3;margin-bottom:4px}
+.diary-area{width:100%;min-height:120px;border:1px solid #3a2d55;border-radius:14px;padding:12px;font-size:14px;outline:none;background:#1c1630;resize:vertical;font-family:inherit;line-height:1.7}
+.diary-area:focus{border-color:#c084fc;background:#221a33}
+.diary-entry{background:#2d2344;border-radius:12px;padding:10px 12px;margin-bottom:8px;border:1px solid #3a2d55}
+.diary-entry .dh{font-size:11px;color:#c084fc;margin-bottom:4px}
 .diary-entry .db{font-size:13px;color:var(--sub);line-height:1.7;white-space:pre-wrap}
 
 /* 参数表单 */
 .param-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px}
 .param-grid label{font-size:11px;color:var(--sub)}
-.param-grid input,.param-grid select{width:100%;border:1px solid var(--line);border-radius:10px;padding:7px;font-size:13px;background:#fffafa}
+.param-grid input,.param-grid select{width:100%;border:1px solid var(--line);border-radius:10px;padding:7px;font-size:13px;background:#1c1630}
 
 /* 底部导航 */
-.bottom-nav{position:fixed;bottom:0;left:0;right:0;background:rgba(255,255,255,.96);backdrop-filter:blur(10px);border-top:1px solid #ffe4eb;display:flex;justify-content:space-around;padding:5px 0 8px;z-index:100;max-width:480px;margin:0 auto}
-.nav-tab{display:flex;flex-direction:column;align-items:center;gap:1px;border:none;background:none;font-size:9px;color:#9d8189;cursor:pointer;padding:3px 1px;min-width:0;transition:.15s}
+.bottom-nav{position:fixed;bottom:0;left:0;right:0;background:rgba(34,26,51,.96);backdrop-filter:blur(10px);border-top:1px solid #3a2d55;display:flex;justify-content:space-around;padding:5px 0 8px;z-index:100;max-width:480px;margin:0 auto}
+.nav-tab{display:flex;flex-direction:column;align-items:center;gap:1px;border:none;background:none;font-size:9px;color:#9d8fc0;cursor:pointer;padding:3px 1px;min-width:0;transition:.15s}
 .nav-tab .ni{font-size:18px;width:28px;height:28px;display:flex;align-items:center;justify-content:center;border-radius:50%;transition:.15s}
-.nav-tab.on{color:#ff6b81}
-.nav-tab.on .ni{background:#fff0f3;transform:scale(1.1)}
+.nav-tab.on{color:#a78bfa}
+.nav-tab.on .ni{background:#2d2344;transform:scale(1.1)}
 
 /* 弹窗 */
-.modal{position:fixed;inset:0;background:rgba(90,61,68,.45);display:none;align-items:flex-end;justify-content:center;z-index:200}
+.modal{position:fixed;inset:0;background:rgba(10,6,20,.6);display:none;align-items:flex-end;justify-content:center;z-index:200}
 .modal.show{display:flex}
-.modal-c{background:#fff;width:100%;max-width:480px;border-radius:24px 24px 0 0;padding:18px;max-height:80vh;overflow-y:auto;border-top:3px solid #ff8fa3}
-.modal-t{font-size:16px;font-weight:700;margin-bottom:12px;color:#ff6b81}
+.modal-c{background:#221a33;width:100%;max-width:480px;border-radius:24px 24px 0 0;padding:18px;max-height:80vh;overflow-y:auto;border-top:3px solid #c084fc}
+.modal-t{font-size:16px;font-weight:700;margin-bottom:12px;color:#a78bfa}
 .modal-r{margin-bottom:12px}
 .modal-r label{display:block;font-size:12px;color:var(--sub);margin-bottom:4px}
-.modal-r input,.modal-r select{width:100%;border:1px solid #ffd6e0;border-radius:12px;padding:10px;font-size:14px;outline:none;background:#fffafa}
+.modal-r input,.modal-r select{width:100%;border:1px solid #3a2d55;border-radius:12px;padding:10px;font-size:14px;outline:none;background:#1c1630}
 .modal-acts{display:flex;gap:10px;margin-top:14px}
 .modal-acts .btn{flex:1}
 
-.history-item{font-size:12px;padding:8px 0;border-bottom:1px dashed #ffe4eb}
+.history-item{font-size:12px;padding:8px 0;border-bottom:1px dashed #3a2d55}
 .empty{text-align:center;color:var(--sub);font-size:13px;padding:16px}
 .pill-group{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}
-.pill{padding:5px 10px;border-radius:14px;background:#fff0f3;font-size:11px;cursor:pointer;border:1px solid transparent;color:#9d8189}
-.pill.on{background:linear-gradient(135deg,#ff8fa3,#ff6b81);color:#fff;box-shadow:0 2px 6px rgba(255,107,129,.15)}
+.pill{padding:5px 10px;border-radius:14px;background:#2d2344;font-size:11px;cursor:pointer;border:1px solid transparent;color:#9d8fc0}
+.pill.on{background:linear-gradient(135deg,#c084fc,#a78bfa);color:#1a1428;font-weight:600;box-shadow:0 2px 6px rgba(139,92,246,.3)}
 
 @keyframes float{0%,100%{transform:translateY(0) rotate(0deg)}50%{transform:translateY(-8px) rotate(5deg)}}
 .deco{position:fixed;font-size:20px;opacity:.14;pointer-events:none;animation:float 4s ease-in-out infinite;z-index:0}
 .d1{top:6%;left:5%;animation-delay:0s}.d2{top:20%;right:6%;animation-delay:1.2s}.d3{top:55%;left:4%;animation-delay:.6s}.d4{top:75%;right:5%;animation-delay:1.8s}
 
 /* 侧边栏 */
-.sidebar-overlay{position:fixed;inset:0;background:rgba(90,61,68,.35);z-index:150;display:none}
+.sidebar-overlay{position:fixed;inset:0;background:rgba(10,6,20,.5);z-index:150;display:none}
 .sidebar-overlay.show{display:block}
-.sidebar{position:fixed;top:0;left:0;bottom:0;width:260px;background:#fff;z-index:160;transform:translateX(-100%);transition:transform .25s ease;box-shadow:2px 0 20px rgba(0,0,0,.08);display:flex;flex-direction:column}
+.sidebar{position:fixed;top:0;left:0;bottom:0;width:260px;background:#221a33;z-index:160;transform:translateX(-100%);transition:transform .25s ease;box-shadow:2px 0 20px rgba(0,0,0,.08);display:flex;flex-direction:column}
 .sidebar.open{transform:translateX(0)}
-.sidebar-head{padding:18px 16px 14px;border-bottom:1px solid #ffe4eb;display:flex;justify-content:space-between;align-items:center}
-.sidebar-head h3{margin:0;font-size:16px;color:#ff6b81}
+.sidebar-head{padding:18px 16px 14px;border-bottom:1px solid #3a2d55;display:flex;justify-content:space-between;align-items:center}
+.sidebar-head h3{margin:0;font-size:16px;color:#a78bfa}
 .sidebar-close{font-size:22px;border:none;background:none;color:var(--sub);cursor:pointer;padding:4px 8px}
 .sidebar-list{flex:1;overflow-y:auto;padding:8px 0}
 .sidebar-item{display:flex;align-items:center;gap:10px;padding:13px 16px;border:none;background:none;width:100%;text-align:left;font-size:14px;color:var(--text);cursor:pointer;border-left:3px solid transparent}
-.sidebar-item:active{background:#fff0f3}
+.sidebar-item:active{background:#2d2344}
 .sidebar-item .si{font-size:20px;width:28px;text-align:center}
-.sidebar-item.on{background:#fff0f3;border-left-color:#ff6b81;color:#ff6b81;font-weight:600}
-.sidebar-foot{padding:12px 16px;border-top:1px solid #ffe4eb;font-size:11px;color:var(--sub);text-align:center}
+.sidebar-item.on{background:#2d2344;border-left-color:#a78bfa;color:#a78bfa;font-weight:600}
+.sidebar-foot{padding:12px 16px;border-top:1px solid #3a2d55;font-size:11px;color:var(--sub);text-align:center}
 
 /* header 汉堡 */
 .hamburger{font-size:22px;border:none;background:none;color:var(--sub);cursor:pointer;padding:4px;line-height:1}
-header h1{margin:0;font-size:18px;color:#ff6b81;letter-spacing:.5px;flex:1}
+header h1{margin:0;font-size:18px;color:#a78bfa;letter-spacing:.5px;flex:1}
 </style>
 </head>
 <body>
-<div class="deco d1">🌸</div><div class="deco d2">💖</div><div class="deco d3">🎀</div><div class="deco d4">✨</div>
+<div class="deco d1">💀</div><div class="deco d2">🖤</div><div class="deco d3">🎀</div><div class="deco d4">👿</div>
 <div class="container">
   <header>
     <button class="hamburger" onclick="toggleSidebar()" aria-label="菜单">☰</button>
-    <h1>✨ 我的小工作台</h1>
+    <h1>💜 静静的工作台</h1>
     <div class="date" id="todayDate"></div>
   </header>
   <div class="greet" id="greet"></div>
@@ -159,7 +159,7 @@ header h1{margin:0;font-size:18px;color:#ff6b81;letter-spacing:.5px;flex:1}
   <!-- ========== 任务面板 ========== -->
   <section class="panel active" id="panel-task">
     <div class="card">
-      <div class="card-title"><span class="ci">🎀</span>任务目标打卡</div>
+      <div class="card-title"><span class="ci">💀</span>任务目标打卡</div>
       <div class="todo-tabs">
         <button class="ttab on" data-scope="day" onclick="switchScope('day')">今日</button>
         <button class="ttab" data-scope="week" onclick="switchScope('week')">本周</button>
@@ -338,7 +338,7 @@ header h1{margin:0;font-size:18px;color:#ff6b81;letter-spacing:.5px;flex:1}
 <!-- 新任务弹窗 -->
 <div class="modal" id="taskModal">
   <div class="modal-c">
-    <div class="modal-t">🎀 新增任务</div>
+    <div class="modal-t">💀 新增任务</div>
     <div class="modal-r"><label>任务内容</label><input type="text" id="mtText" placeholder="例如：完成直播间脚本复盘"></div>
     <div class="modal-r"><label>周期</label><select id="mtScope"><option value="day">今日待办</option><option value="week">本周计划</option><option value="month">月度目标</option><option value="year">年度目标</option></select></div>
     <div class="modal-acts"><button class="btn ghost" onclick="closeModal('taskModal')">取消</button><button class="btn" onclick="addModalTask()">保存</button></div>
@@ -404,7 +404,7 @@ function switchScope(s){
 function renderTodos(){
   const list=document.getElementById('todoList');
   const items=data.todos[curScope]||[];
-  list.innerHTML=items.length?items.map((it,i)=>`<li class="ti"><input type="checkbox" ${it.done?'checked':''} onchange="togTodo(${i})"><span class="${it.done?'done':''}">${esc(it.text)}</span><span class="del" onclick="delTodo(${i})">×</span></li>`).join(''):'<li class="empty">还没有任务哦～ 新增一个叭 🎀</li>';
+  list.innerHTML=items.length?items.map((it,i)=>`<li class="ti"><input type="checkbox" ${it.done?'checked':''} onchange="togTodo(${i})"><span class="${it.done?'done':''}">${esc(it.text)}</span><span class="del" onclick="delTodo(${i})">×</span></li>`).join(''):'<li class="empty">还没有任务哦～ 新增一个叭 💀</li>';
   const scopes={day:'今日',week:'本周',month:'本月',year:'年度'};
   let html='';
   for(const k in scopes){const a=data.todos[k]||[];const d=a.filter(x=>x.done).length;html+=`<div class="stat"><div class="num">${d}/${a.length}</div><div class="label">${scopes[k]}</div></div>`;}
@@ -505,24 +505,24 @@ function loadDietParams(){
 }
 function showDietTarget(p){
   const n=calcNutrition(p);
-  document.getElementById('dietTarget').innerHTML=`📊 BMR≈${n.bmr} / TDEE≈${n.tdee} / <b style="color:#ff6b81">每日目标≈${n.target_cal}kcal</b>`;
+  document.getElementById('dietTarget').innerHTML=`📊 BMR≈${n.bmr} / TDEE≈${n.tdee} / <b style="color:#a78bfa">每日目标≈${n.target_cal}kcal</b>`;
 }
 function renderRecipeResult(d){
   let h='';
-  if(d.nutrition){const n=d.nutrition;h+=`<div style="background:#fff0f3;border-radius:12px;padding:10px;margin-bottom:10px;font-size:12px">📊 BMR ${n.bmr} / TDEE ${n.tdee} / 目标 <b style="color:#ff6b81">${n.target_cal}kcal</b>　蛋白${n.protein_g}g·碳水${n.carb_g}g·脂肪${n.fat_g}g</div>`;}
+  if(d.nutrition){const n=d.nutrition;h+=`<div style="background:#2d2344;border-radius:12px;padding:10px;margin-bottom:10px;font-size:12px">📊 BMR ${n.bmr} / TDEE ${n.tdee} / 目标 <b style="color:#a78bfa">${n.target_cal}kcal</b>　蛋白${n.protein_g}g·碳水${n.carb_g}g·脂肪${n.fat_g}g</div>`;}
   if(d.recipe){const rc=d.recipe;
-    h+=`<div class="eng-box"><div style="font-weight:600;color:#ff6b81;margin-bottom:4px">🌅 早餐</div><div style="font-size:13px;color:var(--sub)">${esc(rc.breakfast||'')}</div></div>`;
-    h+=`<div class="eng-box"><div style="font-weight:600;color:#ff6b81;margin-bottom:4px">🍱 午餐</div><div style="font-size:13px;color:var(--sub)">${esc(rc.lunch||'')}</div></div>`;
-    h+=`<div class="eng-box"><div style="font-weight:600;color:#ff6b81;margin-bottom:4px">🌙 晚餐</div><div style="font-size:13px;color:var(--sub)">${esc(rc.dinner||'')}</div></div>`;
-    if(rc.snack)h+=`<div class="eng-box"><div style="font-weight:600;color:#ff6b81;margin-bottom:4px">🍎 加餐</div><div style="font-size:13px;color:var(--sub)">${esc(rc.snack)}</div></div>`;
-    if(rc.tips)h+=`<div style="font-size:12px;color:#e11d48;background:#ffe4e6;padding:8px 10px;border-radius:10px;margin-top:6px">⚠️ ${esc(rc.tips)}</div>`;
+    h+=`<div class="eng-box"><div style="font-weight:600;color:#a78bfa;margin-bottom:4px">🌅 早餐</div><div style="font-size:13px;color:var(--sub)">${esc(rc.breakfast||'')}</div></div>`;
+    h+=`<div class="eng-box"><div style="font-weight:600;color:#a78bfa;margin-bottom:4px">🍱 午餐</div><div style="font-size:13px;color:var(--sub)">${esc(rc.lunch||'')}</div></div>`;
+    h+=`<div class="eng-box"><div style="font-weight:600;color:#a78bfa;margin-bottom:4px">🌙 晚餐</div><div style="font-size:13px;color:var(--sub)">${esc(rc.dinner||'')}</div></div>`;
+    if(rc.snack)h+=`<div class="eng-box"><div style="font-weight:600;color:#a78bfa;margin-bottom:4px">🍎 加餐</div><div style="font-size:13px;color:var(--sub)">${esc(rc.snack)}</div></div>`;
+    if(rc.tips)h+=`<div style="font-size:12px;color:#f9a8d4;background:#3b1d33;padding:8px 10px;border-radius:10px;margin-top:6px">⚠️ ${esc(rc.tips)}</div>`;
   }
   return h;
 }
 function genRecipe(){
   const p=getDietParams();if(!p.weight||!p.height){alert('请先填写身高和体重哦～');return}
   const btn=document.getElementById('genBtn');btn.disabled=true;btn.textContent='🤖 生成中…';
-  document.getElementById('aiRecipe').innerHTML='<div style="color:var(--sub);padding:10px">🎀 正在为你搭配今日养胃减脂食谱…</div>';
+  document.getElementById('aiRecipe').innerHTML='<div style="color:var(--sub);padding:10px">💀 正在为你搭配今日养胃减脂食谱…</div>';
   setTimeout(()=>{
     const d=genRecipeLocal(p);
     document.getElementById('aiRecipe').innerHTML=renderRecipeResult(d);
@@ -593,7 +593,7 @@ function renderHist(){
   const list=document.getElementById('histList');list.innerHTML='';
   if(histType==='todo'){
     const scopes={day:'今日',week:'本周',month:'本月',year:'年度'};
-    for(const k in scopes){const a=data.todos[k]||[];if(a.length)list.innerHTML+=`<div style="font-weight:600;font-size:12px;margin-top:8px;color:#ff6b81">${scopes[k]}</div>`;a.forEach(it=>list.innerHTML+=`<div class="history-item">${it.done?'✅':'⬜'} ${esc(it.text)}</div>`);}
+    for(const k in scopes){const a=data.todos[k]||[];if(a.length)list.innerHTML+=`<div style="font-weight:600;font-size:12px;margin-top:8px;color:#a78bfa">${scopes[k]}</div>`;a.forEach(it=>list.innerHTML+=`<div class="history-item">${it.done?'✅':'⬜'} ${esc(it.text)}</div>`);}
   }else if(histType==='food'){
     const keys=Object.keys(data.food).sort().reverse();
     if(!keys.length){list.innerHTML='<div class="empty">无记录</div>';return}
@@ -626,7 +626,7 @@ function init(){
   const now=new Date();
   document.getElementById('todayDate').textContent=now.toLocaleDateString('zh-CN',{month:'long',day:'numeric',weekday:'short'});
   const h=now.getHours();let g='早上好';if(h>=12)g='下午好';if(h>=18)g='晚上好';
-  document.getElementById('greet').textContent=`${g}呀～ 小仙女操盘手 🎀 今日待办先过一遍叭 👇`;
+  document.getElementById('greet').textContent=`${g}呀～ 🖤 今日待办先过一遍叭 👇`;
   switchPanel('task');
 }
 
