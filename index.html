@@ -1,0 +1,790 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="theme-color" content="#ff6b81">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="工作台">
+<link rel="manifest" href="/manifest.json">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<link rel="icon" type="image/png" href="/icon-192.png">
+<title>我的小工作台</title>
+<style>
+:root{--bg:#fff5f7;--card:#fff;--text:#5a3d44;--sub:#9d8189;--line:#ffd6e0;--primary:#ff8fa3;--primary-light:#ffe4eb;--success:#ff9eb5;--danger:#ff6b81;--warn:#ffc75f;--radius:22px;--shadow:0 4px 14px rgba(255,143,163,.12)}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei","Hiragino Sans GB",sans-serif;background:var(--bg);background-image:radial-gradient(#ffe4eb 1px,transparent 1px);background-size:24px 24px;color:var(--text);line-height:1.6;font-size:15px;padding:0 0 80px}
+.container{max-width:480px;margin:0 auto;padding:14px 16px 10px;position:relative;z-index:1}
+header{display:flex;align-items:center;gap:8px;margin-bottom:6px}
+header h1{margin:0;font-size:20px;color:#ff6b81;letter-spacing:.5px}
+header .date{font-size:11px;color:var(--sub);background:#fff;border:1px solid var(--line);padding:4px 8px;border-radius:16px}
+.greet{font-size:13px;color:var(--sub);margin-bottom:12px;padding-left:2px}
+
+/* Panel 容器 */
+.panel{display:none}
+.panel.active{display:block}
+.panel-scroll{max-height:calc(100vh - 200px);overflow-y:auto;-webkit-overflow-scrolling:touch}
+
+.card{background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);padding:14px 16px;margin-bottom:12px;border:1px solid #fff0f3;position:relative;overflow:hidden}
+.card::before{content:"";position:absolute;top:-20px;right:-20px;width:60px;height:60px;background:radial-gradient(circle,rgba(255,143,163,.12),transparent 70%);border-radius:50%}
+.card-title{font-size:15px;font-weight:700;margin:0 0 10px;display:flex;align-items:center;gap:8px;color:#ff6b81}
+.card-title .ci{font-size:18px;background:var(--primary-light);width:30px;height:30px;display:flex;align-items:center;justify-content:center;border-radius:50%}
+.divider{height:1px;background:var(--line);margin:12px 0;border-radius:1px}
+
+/* 任务 tab */
+.todo-tabs{display:flex;gap:6px;overflow-x:auto;padding-bottom:4px;margin-bottom:10px}
+.todo-tabs::-webkit-scrollbar{display:none}
+.ttab{flex:1;min-width:56px;text-align:center;padding:7px 0;border-radius:20px;background:#fff0f3;font-size:11px;color:var(--sub);border:none;white-space:nowrap;box-shadow:0 2px 4px rgba(255,143,163,.06)}
+.ttab.on{background:linear-gradient(135deg,#ff8fa3,#ff6b81);color:#fff;box-shadow:0 3px 8px rgba(255,107,129,.2)}
+.todo-list{list-style:none;margin:0;padding:0}
+.ti{display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px dashed #ffe4eb}
+.ti:last-child{border-bottom:none}
+.ti input[type=checkbox]{width:18px;height:18px;accent-color:#ff6b81;flex-shrink:0}
+.ti span{flex:1;font-size:13px}
+.ti span.done{text-decoration:line-through;color:var(--sub);opacity:.7}
+.ti .del{color:var(--danger);font-size:11px;cursor:pointer;background:#fff0f2;padding:2px 7px;border-radius:10px}
+.add-row{display:flex;gap:8px;margin-top:10px}
+.add-row input{flex:1;border:1px solid var(--line);border-radius:12px;padding:9px 12px;font-size:13px;outline:none;background:#fffafa}
+.add-row input:focus{border-color:#ff8fa3}
+.btn{padding:8px 14px;border-radius:12px;border:none;background:linear-gradient(135deg,#ff8fa3,#ff6b81);color:#fff;font-size:13px;cursor:pointer;white-space:nowrap;box-shadow:0 3px 8px rgba(255,107,129,.15)}
+.btn.ghost{background:#fff0f3;color:#ff6b81;box-shadow:none}
+.btn.sm{padding:5px 10px;font-size:11px}
+.btn.wide{display:block;width:100%;text-align:center;margin-top:8px}
+.stats{display:flex;gap:6px;justify-content:space-between;margin-top:10px}
+.stat{flex:1;text-align:center;background:linear-gradient(180deg,#fff0f3,#fff);border-radius:14px;padding:10px 2px;border:1px solid #ffe4eb}
+.stat .num{font-size:16px;font-weight:700;color:#ff6b81}
+.stat .label{font-size:10px;color:var(--sub);margin-top:2px}
+
+/* 资讯列表 */
+.info-item{padding:11px 0;border-bottom:1px dashed #ffe4eb}
+.info-item:last-child{border-bottom:none}
+.tag{display:inline-block;font-size:10px;padding:2px 8px;border-radius:14px;margin-right:5px;font-weight:600}
+.tag.risk{background:#ffe4e6;color:#e11d48}.tag.tip{background:#e0f7fa;color:#0891b2}.tag.new{background:#ede9fe;color:#7c3aed}.tag.kw{background:#fff3e0;color:#d97706}.tag.goal{background:#d1fae5;color:#047857}
+.item-title{font-size:14px;font-weight:600;margin-bottom:5px;color:#5a3d44}
+.item-body{font-size:13px;color:var(--sub);line-height:1.75}
+.item-body ul{margin:4px 0 0 16px;padding:0}
+.item-body li{margin-bottom:2px}
+.bullets{margin-top:6px;padding:6px 10px;background:#fafafa;border-radius:10px;font-size:12px;color:var(--sub)}
+
+/* 健康 */
+.check-btn{display:inline-flex;align-items:center;gap:6px;padding:8px 14px;border-radius:20px;border:1px solid #ffd6e0;background:#fff;font-size:13px;cursor:pointer;color:#5a3d44;box-shadow:0 2px 6px rgba(255,143,163,.08)}
+.check-btn.on{background:linear-gradient(135deg,#ff9eb5,#ff8fa3);color:#fff;border-color:transparent}
+.food-list{display:flex;flex-wrap:wrap;gap:6px;margin:10px 0}
+.fchip{background:#fff0f3;padding:5px 10px;border-radius:14px;font-size:11px;display:flex;align-items:center;gap:4px;color:#8b5c66;border:1px solid #ffe4eb}
+.fchip button{border:none;background:#ffe4eb;color:#ff6b81;font-size:12px;cursor:pointer;width:16px;height:16px;border-radius:50%;display:flex;align-items:center;justify-content:center;padding:0}
+.cal-box{text-align:center;padding:14px;background:linear-gradient(135deg,#fff0f3,#fff);border-radius:16px;margin-top:10px;border:1px solid #ffe4eb}
+.cal-box .num{font-size:22px;font-weight:700;color:#ff6b81}
+.cal-box .label{font-size:11px;color:var(--sub)}
+
+/* 英语 */
+.eng-box{background:#fff0f3;border-radius:14px;padding:12px;margin:8px 0;border:1px solid #ffe4eb}
+.eng-en{font-size:15px;font-weight:600;color:#ff6b81;margin-bottom:5px}
+.eng-cn{font-size:12px;color:var(--sub)}
+
+/* 书摘 */
+.quote{font-style:italic;color:#7a4f5a;padding:14px;border-left:4px solid #ff8fa3;background:linear-gradient(90deg,#fff0f3,#fff);border-radius:0 16px 16px 0;line-height:1.8}
+.quote-src{text-align:right;font-size:11px;color:#ff8fa3;margin-top:6px}
+
+/* 日记 */
+.diary-area{width:100%;min-height:120px;border:1px solid #ffd6e0;border-radius:14px;padding:12px;font-size:14px;outline:none;background:#fffafa;resize:vertical;font-family:inherit;line-height:1.7}
+.diary-area:focus{border-color:#ff8fa3;background:#fff}
+.diary-entry{background:#fff0f3;border-radius:12px;padding:10px 12px;margin-bottom:8px;border:1px solid #ffe4eb}
+.diary-entry .dh{font-size:11px;color:#ff8fa3;margin-bottom:4px}
+.diary-entry .db{font-size:13px;color:var(--sub);line-height:1.7;white-space:pre-wrap}
+
+/* 参数表单 */
+.param-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px}
+.param-grid label{font-size:11px;color:var(--sub)}
+.param-grid input,.param-grid select{width:100%;border:1px solid var(--line);border-radius:10px;padding:7px;font-size:13px;background:#fffafa}
+
+/* 底部导航 */
+.bottom-nav{position:fixed;bottom:0;left:0;right:0;background:rgba(255,255,255,.96);backdrop-filter:blur(10px);border-top:1px solid #ffe4eb;display:flex;justify-content:space-around;padding:5px 0 8px;z-index:100;max-width:480px;margin:0 auto}
+.nav-tab{display:flex;flex-direction:column;align-items:center;gap:1px;border:none;background:none;font-size:9px;color:#9d8189;cursor:pointer;padding:3px 1px;min-width:0;transition:.15s}
+.nav-tab .ni{font-size:18px;width:28px;height:28px;display:flex;align-items:center;justify-content:center;border-radius:50%;transition:.15s}
+.nav-tab.on{color:#ff6b81}
+.nav-tab.on .ni{background:#fff0f3;transform:scale(1.1)}
+
+/* 弹窗 */
+.modal{position:fixed;inset:0;background:rgba(90,61,68,.45);display:none;align-items:flex-end;justify-content:center;z-index:200}
+.modal.show{display:flex}
+.modal-c{background:#fff;width:100%;max-width:480px;border-radius:24px 24px 0 0;padding:18px;max-height:80vh;overflow-y:auto;border-top:3px solid #ff8fa3}
+.modal-t{font-size:16px;font-weight:700;margin-bottom:12px;color:#ff6b81}
+.modal-r{margin-bottom:12px}
+.modal-r label{display:block;font-size:12px;color:var(--sub);margin-bottom:4px}
+.modal-r input,.modal-r select{width:100%;border:1px solid #ffd6e0;border-radius:12px;padding:10px;font-size:14px;outline:none;background:#fffafa}
+.modal-acts{display:flex;gap:10px;margin-top:14px}
+.modal-acts .btn{flex:1}
+
+.history-item{font-size:12px;padding:8px 0;border-bottom:1px dashed #ffe4eb}
+.empty{text-align:center;color:var(--sub);font-size:13px;padding:16px}
+.pill-group{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}
+.pill{padding:5px 10px;border-radius:14px;background:#fff0f3;font-size:11px;cursor:pointer;border:1px solid transparent;color:#9d8189}
+.pill.on{background:linear-gradient(135deg,#ff8fa3,#ff6b81);color:#fff;box-shadow:0 2px 6px rgba(255,107,129,.15)}
+
+@keyframes float{0%,100%{transform:translateY(0) rotate(0deg)}50%{transform:translateY(-8px) rotate(5deg)}}
+.deco{position:fixed;font-size:20px;opacity:.14;pointer-events:none;animation:float 4s ease-in-out infinite;z-index:0}
+.d1{top:6%;left:5%;animation-delay:0s}.d2{top:20%;right:6%;animation-delay:1.2s}.d3{top:55%;left:4%;animation-delay:.6s}.d4{top:75%;right:5%;animation-delay:1.8s}
+
+/* 侧边栏 */
+.sidebar-overlay{position:fixed;inset:0;background:rgba(90,61,68,.35);z-index:150;display:none}
+.sidebar-overlay.show{display:block}
+.sidebar{position:fixed;top:0;left:0;bottom:0;width:260px;background:#fff;z-index:160;transform:translateX(-100%);transition:transform .25s ease;box-shadow:2px 0 20px rgba(0,0,0,.08);display:flex;flex-direction:column}
+.sidebar.open{transform:translateX(0)}
+.sidebar-head{padding:18px 16px 14px;border-bottom:1px solid #ffe4eb;display:flex;justify-content:space-between;align-items:center}
+.sidebar-head h3{margin:0;font-size:16px;color:#ff6b81}
+.sidebar-close{font-size:22px;border:none;background:none;color:var(--sub);cursor:pointer;padding:4px 8px}
+.sidebar-list{flex:1;overflow-y:auto;padding:8px 0}
+.sidebar-item{display:flex;align-items:center;gap:10px;padding:13px 16px;border:none;background:none;width:100%;text-align:left;font-size:14px;color:var(--text);cursor:pointer;border-left:3px solid transparent}
+.sidebar-item:active{background:#fff0f3}
+.sidebar-item .si{font-size:20px;width:28px;text-align:center}
+.sidebar-item.on{background:#fff0f3;border-left-color:#ff6b81;color:#ff6b81;font-weight:600}
+.sidebar-foot{padding:12px 16px;border-top:1px solid #ffe4eb;font-size:11px;color:var(--sub);text-align:center}
+
+/* header 汉堡 */
+.hamburger{font-size:22px;border:none;background:none;color:var(--sub);cursor:pointer;padding:4px;line-height:1}
+header h1{margin:0;font-size:18px;color:#ff6b81;letter-spacing:.5px;flex:1}
+</style>
+</head>
+<body>
+<div class="deco d1">🌸</div><div class="deco d2">💖</div><div class="deco d3">🎀</div><div class="deco d4">✨</div>
+<div class="container">
+  <header>
+    <button class="hamburger" onclick="toggleSidebar()" aria-label="菜单">☰</button>
+    <h1>✨ 我的小工作台</h1>
+    <div class="date" id="todayDate"></div>
+  </header>
+  <div class="greet" id="greet"></div>
+
+  <!-- ========== 任务面板 ========== -->
+  <section class="panel active" id="panel-task">
+    <div class="card">
+      <div class="card-title"><span class="ci">🎀</span>任务目标打卡</div>
+      <div class="todo-tabs">
+        <button class="ttab on" data-scope="day" onclick="switchScope('day')">今日</button>
+        <button class="ttab" data-scope="week" onclick="switchScope('week')">本周</button>
+        <button class="ttab" data-scope="month" onclick="switchScope('month')">本月</button>
+        <button class="ttab" data-scope="year" onclick="switchScope('year')">年度</button>
+      </div>
+      <ul class="todo-list" id="todoList"></ul>
+      <div class="add-row">
+        <input type="text" id="newTodo" placeholder="输入新任务…" onkeydown="if(event.key==='Enter')addTodo()">
+        <button class="btn" onclick="addTodo()">新增</button>
+      </div>
+      <div class="divider"></div>
+      <div class="stats" id="stats"></div>
+      <div style="margin-top:8px;font-size:11px;color:var(--sub);text-align:center">上周完成：<span id="lwStat">-</span>｜上月完成：<span id="lmStat">-</span></div>
+    </div>
+    <button class="btn ghost wide" onclick="showModal('histModal');setHistType('todo');renderHist()">📊 查看历史记录</button>
+  </section>
+
+  <!-- ========== 家清面板 ========== -->
+  <section class="panel" id="panel-home">
+    <div class="panel-scroll"><div class="card">
+      <div class="card-title"><span class="ci">🧼</span>家清情报 · 家居清洁赛道</div>
+      <div id="homeContent"></div>
+    </div></div>
+  </section>
+
+  <!-- ========== 个护面板 ========== -->
+  <section class="panel" id="panel-care">
+    <div class="panel-scroll"><div class="card">
+      <div class="card-title"><span class="ci">💄</span>个护情报 · 个人护理赛道</div>
+      <div id="careContent"></div>
+    </div></div>
+  </section>
+
+  <!-- ========== 快消面板 ========== -->
+  <section class="panel" id="panel-fmc">
+    <div class="panel-scroll"><div class="card">
+      <div class="card-title"><span class="ci">🧴</span>快消情报 · 快速消费品赛道</div>
+      <div id="fmcContent"></div>
+    </div></div>
+  </section>
+
+  <!-- ========== 跨境面板 ========== -->
+  <section class="panel" id="panel-cross">
+    <div class="panel-scroll"><div class="card">
+      <div class="card-title"><span class="ci">✈️</span>跨境电商小白学习</div>
+      <div id="crossContent"></div>
+    </div></div>
+  </section>
+
+  <!-- ========== 健康面板 ========== -->
+  <section class="panel" id="panel-health">
+    <div class="panel-scroll">
+      <div class="card">
+        <div class="card-title"><span class="ci">🍑</span>健身打卡</div>
+        <div style="display:flex;gap:10px;align-items:center">
+          <button class="check-btn" id="fitBtn" onclick="toggleFitness()">🧘 今日健身打卡</button>
+          <span id="fitState" style="font-size:13px;color:var(--sub)">未打卡</span>
+        </div>
+        <button class="btn ghost wide sm" style="margin-top:8px" onclick="showModal('histModal');setHistType('fitness');renderHist()">📊 健身历史</button>
+      </div>
+      <div class="card">
+        <div class="card-title"><span class="ci">🍰</span>饮食记录</div>
+        <div class="food-list" id="foodList"></div>
+        <div class="add-row">
+          <input type="text" id="foodName" placeholder="食物名称" style="flex:1.2">
+          <input type="number" id="foodCal" placeholder="千卡" style="flex:.8">
+          <button class="btn" onclick="addFood()">+</button>
+        </div>
+        <div class="cal-box"><div class="num" id="totalCal">0</div><div class="label">今日摄入千卡</div></div>
+        <button class="btn ghost wide sm" style="margin-top:6px" onclick="showModal('histModal');setHistType('food');renderHist()">📊 饮食历史</button>
+      </div>
+      <div class="card">
+        <div class="card-title"><span class="ci">🤖</span>AI 减脂食谱</div>
+        <div class="param-grid">
+          <div><label>性别</label><select id="pGender"><option value="女">女</option><option value="男">男</option></select></div>
+          <div><label>年龄</label><input id="pAge" type="number" placeholder="如30"></div>
+          <div><label>身高(cm)</label><input id="pHeight" type="number" placeholder="如165"></div>
+          <div><label>当前体重(kg)</label><input id="pWeight" type="number" placeholder="如60"></div>
+          <div><label>目标体重(kg)</label><input id="pTarget" type="number" placeholder="如55"></div>
+          <div><label>减脂速度</label><select id="pSpeed"><option value="0.5">温和 0.5kg/周</option><option value="0.75" selected>标准 0.75</option><option value="1">快速 1kg</option></select></div>
+        </div>
+        <div style="display:flex;gap:8px;margin-bottom:8px">
+          <button class="btn ghost sm" onclick="saveDietParams()">💾 保存参数</button>
+          <button class="btn sm" id="genBtn" onclick="genRecipe()">🤖 生成今日食谱</button>
+        </div>
+        <div id="dietTarget" style="font-size:11px;color:var(--sub);margin-bottom:8px"></div>
+        <div id="aiRecipe" style="font-size:13px"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========== 英语面板 ========== -->
+  <section class="panel" id="panel-eng">
+    <div class="panel-scroll"><div class="card">
+      <div class="card-title"><span class="ci">🦋</span>英语口语碎片练习</div>
+      <div id="engContent"></div>
+      <div style="margin-top:10px"><button class="check-btn" id="engBtn" onclick="toggleEnglish()">🦋 今日英语打卡</button></div>
+      <button class="btn ghost wide sm" style="margin-top:8px" onclick="showModal('histModal');setHistType('english');renderHist()">📊 英语打卡历史</button>
+    </div></div>
+  </section>
+
+  <!-- ========== 财经面板 ========== -->
+  <section class="panel" id="panel-fin">
+    <div class="panel-scroll"><div class="card">
+      <div class="card-title"><span class="ci">🐷</span>普通人财经知识</div>
+      <div id="finContent"></div>
+    </div></div>
+  </section>
+
+  <!-- ========== 书摘面板 ========== -->
+  <section class="panel" id="panel-quote">
+    <div class="panel-scroll"><div class="card">
+      <div class="card-title"><span class="ci">🌙</span>每日书摘</div>
+      <div id="quoteContent"></div>
+    </div></div>
+  </section>
+
+  <!-- ========== 日记面板 ========== -->
+  <section class="panel" id="panel-diary">
+    <div class="card">
+      <div class="card-title"><span class="ci">📔</span>每日日记 <span id="diaryDate" style="font-size:12px;color:var(--sub);font-weight:400"></span></div>
+      <textarea class="diary-area" id="diaryText" placeholder="今天发生了什么？心情怎样？想到什么就写下来吧～"></textarea>
+      <div style="display:flex;gap:8px;margin-top:10px">
+        <button class="btn" onclick="saveDiary()" style="flex:1">💾 保存日记</button>
+        <button class="btn ghost" onclick="loadDiary()" style="flex:1">📖 查看今日</button>
+      </div>
+      <div id="diaryHist" style="margin-top:10px;max-height:35vh;overflow-y:auto"></div>
+    </div>
+  </section>
+</div>
+
+<!-- 侧边栏 -->
+<div class="sidebar-overlay" id="sbOverlay" onclick="toggleSidebar()"></div>
+<aside class="sidebar" id="sidebar">
+  <div class="sidebar-head">
+    <h3>📚 学习资讯</h3>
+    <button class="sidebar-close" onclick="toggleSidebar()">✕</button>
+  </div>
+  <div class="sidebar-list">
+    <button class="sidebar-item" data-panel="home" onclick="openFromSidebar('home')"><span class="si">🧼</span>家清情报</button>
+    <button class="sidebar-item" data-panel="care" onclick="openFromSidebar('care')"><span class="si">💄</span>个护情报</button>
+    <button class="sidebar-item" data-panel="fmc" onclick="openFromSidebar('fmc')"><span class="si">🧴</span>快消情报</button>
+    <button class="sidebar-item" data-panel="cross" onclick="openFromSidebar('cross')"><span class="si">✈️</span>跨境电商学习</button>
+    <button class="sidebar-item" data-panel="eng" onclick="openFromSidebar('eng')"><span class="si">🦋</span>英语口语练习</button>
+    <button class="sidebar-item" data-panel="fin" onclick="openFromSidebar('fin')"><span class="si">🐷</span>普通人财经知识</button>
+    <button class="sidebar-item" data-panel="quote" onclick="openFromSidebar('quote')"><span class="si">🌙</span>每日书摘</button>
+  </div>
+  <div class="sidebar-foot">点击模块进入查看 · 左上角 ☰ 打开</div>
+</aside>
+
+<!-- 底部导航 -->
+<nav class="bottom-nav">
+  <button class="nav-tab on" data-panel="task" onclick="switchPanel('task')"><span class="ni">🎯</span>任务</button>
+  <button class="nav-tab" data-panel="health" onclick="switchPanel('health')"><span class="ni">🍑</span>健康</button>
+  <button class="nav-tab" data-panel="diary" onclick="switchPanel('diary')"><span class="ni">📔</span>日记</button>
+</nav>
+
+
+<!-- 历史记录弹窗（共用） -->
+<div class="modal" id="histModal">
+  <div class="modal-c">
+    <div class="modal-t">📊 历史记录</div>
+    <div class="pill-group">
+      <span class="pill on" data-ht="todo" onclick="setHistType('todo');renderHist()">任务</span>
+      <span class="pill" data-ht="food" onclick="setHistType('food');renderHist()">饮食</span>
+      <span class="pill" data-ht="fitness" onclick="setHistType('fitness');renderHist()">健身</span>
+      <span class="pill" data-ht="english" onclick="setHistType('english');renderHist()">英语</span>
+      <span class="pill" data-ht="diary" onclick="setHistType('diary');renderHist()">日记</span>
+    </div>
+    <div id="histList" style="margin-top:10px;max-height:50vh;overflow-y:auto"></div>
+    <div class="modal-acts"><button class="btn ghost" onclick="closeModal('histModal')">关闭</button></div>
+  </div>
+</div>
+
+<!-- 新任务弹窗 -->
+<div class="modal" id="taskModal">
+  <div class="modal-c">
+    <div class="modal-t">🎀 新增任务</div>
+    <div class="modal-r"><label>任务内容</label><input type="text" id="mtText" placeholder="例如：完成直播间脚本复盘"></div>
+    <div class="modal-r"><label>周期</label><select id="mtScope"><option value="day">今日待办</option><option value="week">本周计划</option><option value="month">月度目标</option><option value="year">年度目标</option></select></div>
+    <div class="modal-acts"><button class="btn ghost" onclick="closeModal('taskModal')">取消</button><button class="btn" onclick="addModalTask()">保存</button></div>
+  </div>
+</div>
+
+<script>
+/* ========== 数据存储 ========== */
+const SK='workbench_v2';
+function ld(){let d=localStorage.getItem(SK);if(!d)return initData();try{return JSON.parse(d)}catch(e){return initData()}}
+function sv(d){localStorage.setItem(SK,JSON.stringify(d))}
+function initData(){
+  return {
+    todos:{day:[{text:'查看今日直播电商情报',done:false},{text:'完成1次英语口语练习',done:false}],week:[{text:'复盘本周直播间数据',done:false}],month:[{text:'优化商品卡点击率',done:false}],year:[{text:'搭建个人IP内容矩阵',done:false}]},
+    fitness:{},food:{},english:{},diary:{},settings:{}
+  };
+}
+let data=ld();
+let curScope='day',curPanel='task',histType='todo';
+
+/* ========== 工具 ========== */
+function dk(d){return d.toISOString().slice(0,10)}
+function tk(){return dk(new Date())}
+function esc(s){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;','\'':'&#39;'}[c]))}
+
+/* ========== 面板切换 ========== */
+function switchPanel(name){
+  curPanel=name;
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+  // 底部 tab 高亮（只针对底部3个）
+  document.querySelectorAll('.nav-tab').forEach(t=>t.classList.toggle('on',t.dataset.panel===name));
+  // 侧边栏高亮
+  document.querySelectorAll('.sidebar-item').forEach(s=>s.classList.toggle('on',s.dataset.panel===name));
+  document.getElementById('panel-'+name).classList.add('active');
+  if(name==='task')renderTodos();
+  if(name==='health'){renderFitness();renderFood();loadDietParams();loadTodayRecipe();}
+  if(name==='eng')renderEnglish();
+  if(name==='diary'){document.getElementById('diaryDate').textContent='· '+new Date().toLocaleDateString('zh-CN',{month:'long',day:'numeric'});loadDiary();}
+  if(name==='home')renderHome();
+  if(name==='care')renderCare();
+  if(name==='fmc')renderFmc();
+  if(name==='cross')renderCross();
+  if(name==='fin')renderFin();
+  if(name==='quote')renderQuote();
+}
+
+/* ========== 侧边栏 ========== */
+function toggleSidebar(){
+  const s=document.getElementById('sidebar'),o=document.getElementById('sbOverlay');
+  s.classList.toggle('open');o.classList.toggle('show');
+}
+function openFromSidebar(name){
+  toggleSidebar();
+  switchPanel(name);
+}
+
+/* ========== 任务 ========== */
+function switchScope(s){
+  curScope=s;
+  document.querySelectorAll('.ttab').forEach(t=>t.classList.toggle('on',t.dataset.scope===s));
+  renderTodos();
+}
+function renderTodos(){
+  const list=document.getElementById('todoList');
+  const items=data.todos[curScope]||[];
+  list.innerHTML=items.length?items.map((it,i)=>`<li class="ti"><input type="checkbox" ${it.done?'checked':''} onchange="togTodo(${i})"><span class="${it.done?'done':''}">${esc(it.text)}</span><span class="del" onclick="delTodo(${i})">×</span></li>`).join(''):'<li class="empty">还没有任务哦～ 新增一个叭 🎀</li>';
+  const scopes={day:'今日',week:'本周',month:'本月',year:'年度'};
+  let html='';
+  for(const k in scopes){const a=data.todos[k]||[];const d=a.filter(x=>x.done).length;html+=`<div class="stat"><div class="num">${d}/${a.length}</div><div class="label">${scopes[k]}</div></div>`;}
+  document.getElementById('stats').innerHTML=html;
+  document.getElementById('lwStat').textContent='-';document.getElementById('lmStat').textContent='-';
+}
+function addTodo(){
+  const v=document.getElementById('newTodo').value.trim();if(!v)return;
+  if(!data.todos[curScope])data.todos[curScope]=[];
+  data.todos[curScope].push({text:v,done:false});document.getElementById('newTodo').value='';sv(data);renderTodos();
+}
+function addModalTask(){
+  const v=document.getElementById('mtText').value.trim(),s=document.getElementById('mtScope').value;if(!v)return;
+  if(!data.todos[s])data.todos[s]=[];
+  data.todos[s].push({text:v,done:false});sv(data);closeModal('taskModal');curScope=s;switchPanel('task');switchScope(s);
+}
+function togTodo(i){data.todos[curScope][i].done=!data.todos[curScope][i].done;sv(data);renderTodos();}
+function delTodo(i){data.todos[curScope].splice(i,1);sv(data);renderTodos();}
+
+/* ========== 健身 ========== */
+function renderFitness(){
+  const t=tk(),done=data.fitness[t];
+  document.getElementById('fitBtn').classList.toggle('on',done);
+  document.getElementById('fitState').textContent=done?'已完成 ✅':'未打卡';
+}
+function toggleFitness(){const t=tk();data.fitness[t]=!data.fitness[t];sv(data);renderFitness();}
+
+/* ========== 饮食 ========== */
+function renderFood(){
+  const t=tk(),arr=data.food[t]||[];let total=0;
+  document.getElementById('foodList').innerHTML=arr.map((f,i)=>{total+=Number(f.cal)||0;return `<div class="fchip"><span>${esc(f.name)} ${f.cal}kcal</span><button onclick="delFood(${i})">×</button></div>`}).join('');
+  document.getElementById('totalCal').textContent=total;
+}
+function addFood(){
+  const name=document.getElementById('foodName').value.trim(),cal=Number(document.getElementById('foodCal').value)||0;if(!name)return;
+  const t=tk();if(!data.food[t])data.food[t]=[];
+  data.food[t].push({name,cal});sv(data);document.getElementById('foodName').value='';document.getElementById('foodCal').value='';renderFood();
+}
+function delFood(i){const t=tk();data.food[t].splice(i,1);sv(data);renderFood();}
+
+/* ========== 减脂参数 + AI 食谱 ========== */
+function getDietParams(){
+  return {gender:document.getElementById('pGender').value,age:document.getElementById('pAge').value||30,height:document.getElementById('pHeight').value||165,weight:document.getElementById('pWeight').value||60,target_weight:document.getElementById('pTarget').value||60,speed:document.getElementById('pSpeed').value||0.75};
+}
+function saveDietParams(){const p=getDietParams();localStorage.setItem('wb_diet',JSON.stringify(p));showDietTarget(p);alert('参数已保存 💾');}
+function loadDietParams(){
+  const s=localStorage.getItem('wb_diet');
+  if(s){try{const p=JSON.parse(s);document.getElementById('pGender').value=p.gender||'女';document.getElementById('pAge').value=p.age||'';document.getElementById('pHeight').value=p.height||'';document.getElementById('pWeight').value=p.weight||'';document.getElementById('pTarget').value=p.target_weight||'';document.getElementById('pSpeed').value=p.speed||0.75;showDietTarget(p);}catch(e){showDietTarget(getDietParams())}}
+  else showDietTarget(getDietParams());
+}
+/* ========== 减脂参数 + 本地食谱算法 ========== */
+const FOODS={
+  breakfast_main:[['小米粥(1碗)',140],['山药小米粥(1碗)',150],['蒸蛋羹(2个蛋)',120],['软白馒头(1个)',130],['燕麦粥(淡奶版)',160],['南瓜粥(1碗)',110],['红薯(中等1个,蒸)',130]],
+  breakfast_side:[['蒸南瓜(几块)',50],['嫩豆腐(1小块)',60],['苏打饼干(3片)',70],['香蕉(半根)',45],['温燕麦奶(小杯)',90]],
+  lunch_protein:[['清蒸鲈鱼(100g)',110],['水煮鸡胸(100g)',130],['蒸鳕鱼(100g)',90],['嫩豆腐炖蛋(1份)',130],['虾仁蒸蛋(1份)',120],['瘦猪肉末蒸冬瓜(1份)',140]],
+  lunch_veg:[['水煮西兰花(1份)',45],['清蒸冬瓜(1份)',35],['水煮嫩菜心(1份)',40],['蒸南瓜(1份)',50],['清炒嫩丝瓜(少油)',60]],
+  lunch_carb:[['软米饭(小碗)',180],['杂粮软饭(小碗)',170],['软面条(1小碗)',190]],
+  dinner_protein:[['南瓜瘦肉粥(1碗)',150],['蒸蛋羹(2个蛋)',120],['清蒸鱼(80g)',90],['嫩豆腐羹(1份)',110],['鸡丝冬瓜汤(1碗)',100]],
+  dinner_veg:[['蒸南瓜(几块)',50],['水煮冬瓜(1份)',35],['嫩菜心(1份)',40],['蒸山药(几段)',80]],
+  dinner_carb:[['软小米粥(1碗)',140],['软米饭(半碗)',120],['南瓜粥(1碗)',110]],
+  snack:[['苏打饼干(3片)+温燕麦奶',160],['香蕉(半根)+无糖酸奶(小杯)',140],['蒸南瓜(几块)+嫩豆腐',110],['温热燕麦奶(1小杯)',90]]
+};
+const GERD_TIPS=['少食多餐，每餐七分饱，睡前3小时不进食','餐后保持直立或散步，避免立刻躺下','细嚼慢咽，避免进食过快吞入空气','食物温度温热即可，过烫过冷都易诱发反流','餐间可小口喝温水，但进餐时不宜大量饮水'];
+function mulberry32(a){return function(){a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}}
+function pickF(key,rng,exclude){const items=FOODS[key];let c=items[Math.floor(rng()*items.length)];for(let i=0;i<3;i++){if(!exclude||c[0]!==exclude)break;c=items[Math.floor(rng()*items.length)];}return c}
+function calcNutrition(p){
+  const w=Number(p.weight)||60,h=Number(p.height)||165,age=Number(p.age)||30,speed=Number(p.speed)||0.75;
+  let bmr=p.gender==='男'?10*w+6.25*h-5*age+5:10*w+6.25*h-5*age-161;
+  const f={0.5:1.35,0.75:1.5,1:1.65}[speed]||1.5,tdee=bmr*f,def=(speed*7700)/7,target=Math.max(tdee-def,bmr);
+  return{bmr:Math.round(bmr),tdee:Math.round(tdee),deficit:Math.round(def),target_cal:Math.round(target),protein_g:Math.round(target*0.25/4),carb_g:Math.round(target*0.45/4),fat_g:Math.round(target*0.30/9)};
+}
+function genRecipeLocal(p){
+  const n=calcNutrition(p),target=n.target_cal;
+  const seedStr=tk()+'-'+p.weight+'-'+p.target_weight+'-'+p.speed;
+  const seed=Array.from(seedStr).reduce((a,c)=>(a*31+c.charCodeAt(0))>>>0,0);
+  const rng=mulberry32(seed);
+  const goal={b:target*0.25,l:target*0.38,d:target*0.27,s:target*0.10};
+  const bm=pickF('breakfast_main',rng),bs1=pickF('breakfast_side',rng,bm[0]),bs2=pickF('breakfast_side',rng,bs1[0]);
+  let bCal=bm[1]+bs1[1]+bs2[1],bF=Math.max(1,Math.round(goal.b/bCal*10)/10);bCal=Math.round(bCal*bF);
+  const lp=pickF('lunch_protein',rng),lv1=pickF('lunch_veg',rng),lv2=pickF('lunch_veg',rng,lv1[0]),lc=pickF('lunch_carb',rng);
+  let lCal=lp[1]+lv1[1]+lv2[1]+lc[1],lF=Math.max(1,Math.round(goal.l/lCal*10)/10);lCal=Math.round(lCal*lF);
+  const dp=pickF('dinner_protein',rng),dv=pickF('dinner_veg',rng),dc=pickF('dinner_carb',rng);
+  let dCal=dp[1]+dv[1]+dc[1],dF=Math.max(1,Math.round(goal.d/dCal*10)/10);dCal=Math.round(dCal*dF);
+  const sn=FOODS.snack[Math.floor(rng()*FOODS.snack.length)],sCal=sn[1];
+  const total=bCal+lCal+dCal+sCal,diff=total-target;
+  let note= Math.abs(diff)<=80?'热量贴合目标':(diff>0?`略高于目标${Math.abs(diff)}kcal，可适当减少主食`:`略低于目标${Math.abs(diff)}kcal，加餐可增量`);
+  const sc=f=>f>1?`(份量×${f})`:'';
+  return{nutrition:n,recipe:{breakfast:`${bm[0]} + ${bs1[0]} + ${bs2[0]}${sc(bF)}，约${bCal}kcal`,lunch:`${lp[0]} + ${lv1[0]} + ${lv2[0]} + ${lc[0]}${sc(lF)}，约${lCal}kcal`,dinner:`${dp[0]} + ${dv[0]} + ${dc[0]}${sc(dF)}，约${dCal}kcal`,snack:`${sn[0]}，约${sCal}kcal`,tips:`${GERD_TIPS[Math.floor(rng()*GERD_TIPS.length)]}。${note}。本日合计约${total}kcal。`}};
+}
+function getDietParams(){
+  return {gender:document.getElementById('pGender').value,age:document.getElementById('pAge').value||30,height:document.getElementById('pHeight').value||165,weight:document.getElementById('pWeight').value||60,target_weight:document.getElementById('pTarget').value||60,speed:document.getElementById('pSpeed').value||0.75};
+}
+function saveDietParams(){const p=getDietParams();localStorage.setItem('wb_diet',JSON.stringify(p));showDietTarget(p);alert('参数已保存 💾');}
+function loadDietParams(){
+  const s=localStorage.getItem('wb_diet');
+  if(s){try{const p=JSON.parse(s);document.getElementById('pGender').value=p.gender||'女';document.getElementById('pAge').value=p.age||'';document.getElementById('pHeight').value=p.height||'';document.getElementById('pWeight').value=p.weight||'';document.getElementById('pTarget').value=p.target_weight||'';document.getElementById('pSpeed').value=p.speed||0.75;showDietTarget(p);}catch(e){showDietTarget(getDietParams())}}
+  else showDietTarget(getDietParams());
+}
+function showDietTarget(p){
+  const n=calcNutrition(p);
+  document.getElementById('dietTarget').innerHTML=`📊 BMR≈${n.bmr} / TDEE≈${n.tdee} / <b style="color:#ff6b81">每日目标≈${n.target_cal}kcal</b>`;
+}
+function renderRecipeResult(d){
+  let h='';
+  if(d.nutrition){const n=d.nutrition;h+=`<div style="background:#fff0f3;border-radius:12px;padding:10px;margin-bottom:10px;font-size:12px">📊 BMR ${n.bmr} / TDEE ${n.tdee} / 目标 <b style="color:#ff6b81">${n.target_cal}kcal</b>　蛋白${n.protein_g}g·碳水${n.carb_g}g·脂肪${n.fat_g}g</div>`;}
+  if(d.recipe){const rc=d.recipe;
+    h+=`<div class="eng-box"><div style="font-weight:600;color:#ff6b81;margin-bottom:4px">🌅 早餐</div><div style="font-size:13px;color:var(--sub)">${esc(rc.breakfast||'')}</div></div>`;
+    h+=`<div class="eng-box"><div style="font-weight:600;color:#ff6b81;margin-bottom:4px">🍱 午餐</div><div style="font-size:13px;color:var(--sub)">${esc(rc.lunch||'')}</div></div>`;
+    h+=`<div class="eng-box"><div style="font-weight:600;color:#ff6b81;margin-bottom:4px">🌙 晚餐</div><div style="font-size:13px;color:var(--sub)">${esc(rc.dinner||'')}</div></div>`;
+    if(rc.snack)h+=`<div class="eng-box"><div style="font-weight:600;color:#ff6b81;margin-bottom:4px">🍎 加餐</div><div style="font-size:13px;color:var(--sub)">${esc(rc.snack)}</div></div>`;
+    if(rc.tips)h+=`<div style="font-size:12px;color:#e11d48;background:#ffe4e6;padding:8px 10px;border-radius:10px;margin-top:6px">⚠️ ${esc(rc.tips)}</div>`;
+  }
+  return h;
+}
+function genRecipe(){
+  const p=getDietParams();if(!p.weight||!p.height){alert('请先填写身高和体重哦～');return}
+  const btn=document.getElementById('genBtn');btn.disabled=true;btn.textContent='🤖 生成中…';
+  document.getElementById('aiRecipe').innerHTML='<div style="color:var(--sub);padding:10px">🎀 正在为你搭配今日养胃减脂食谱…</div>';
+  setTimeout(()=>{
+    const d=genRecipeLocal(p);
+    document.getElementById('aiRecipe').innerHTML=renderRecipeResult(d);
+    localStorage.setItem('wb_recipe_'+tk(),JSON.stringify(d));
+    btn.disabled=false;btn.textContent='🤖 生成今日食谱';
+  },300);
+}
+function loadTodayRecipe(){
+  const s=localStorage.getItem('wb_recipe_'+tk());if(!s)return;
+  try{const d=JSON.parse(s);document.getElementById('aiRecipe').innerHTML=renderRecipeResult(d);}catch(e){}
+}
+
+/* ========== 英语 ========== */
+function renderEnglish(){
+  const idx=di(englishDB.length),items=[englishDB[idx],englishDB[(idx+1)%englishDB.length],englishDB[(idx+2)%englishDB.length]],t=tk();
+  document.getElementById('engContent').innerHTML=items.map((it,i)=>`<div class="eng-box"><div class="eng-en">${i+1}. ${esc(it.en)}</div><div class="eng-cn">${esc(it.cn)}</div><div class="eng-cn" style="margin-top:4px;font-size:11px">💡 ${esc(it.usage||'')}</div></div>`).join('')+'<div class="item-body" style="margin-top:8px">🎤 练习任务：任选一句，大声读5遍，录音听发音，再用自己的话造句。</div>';
+  document.getElementById('engBtn').classList.toggle('on',!!data.english[t]);
+}
+function toggleEnglish(){const t=tk();data.english[t]=!data.english[t];sv(data);renderEnglish();}
+
+/* ========== 行业情报（家清/个护/快消）========== */
+const TAGS={new:'新规',risk:'⚠风险',tip:'💡实操',data:'📊数据',case:'🏆案例'};
+function renderNewsList(db,targetId){
+  const idx=di(db.length);
+  const items=[db[idx],db[(idx+1)%db.length],db[(idx+2)%db.length]];
+  document.getElementById(targetId).innerHTML=items.map(it=>{
+    return `<div class="info-item"><div class="item-title"><span class="tag ${it.tag}">${TAGS[it.tag]||it.tag}</span>${esc(it.title)}</div><div class="item-body">${esc(it.body)}</div>${it.bullets?`<div class="bullets">${it.bullets.map(b=>'• '+esc(b)).join('<br>')}</div>`:''}</div>`;
+  }).join('');
+}
+function renderHome(){renderNewsList(homeCleanDB,'homeContent');}
+function renderCare(){renderNewsList(personalCareDB,'careContent');}
+function renderFmc(){renderNewsList(fmcDB,'fmcContent');}
+
+/* ========== 跨境 ========== */
+function renderCross(){
+  const idx=di(crossBorderDB.length),it=crossBorderDB[idx];
+  document.getElementById('crossContent').innerHTML=`<div class="info-item"><div class="item-title"><span class="tag kw">第 ${idx+1} 课</span>${esc(it.title)}</div><div class="item-body">${esc(it.body)}</div>${it.tips?`<div class="bullets" style="margin-top:8px"><b>💡 避坑指南：</b><br>${it.tips.map(t=>'• '+esc(t)).join('<br>')}</div>`:''}<div style="margin-top:8px;font-size:12px;color:var(--primary)">📝 今日小任务：${esc(it.task||'用自己的话复述今天学到的核心概念')}</div></div>`;
+}
+
+/* ========== 财经 ========== */
+function renderFin(){
+  const idx=di(financeDB.length),it=financeDB[idx];
+  document.getElementById('finContent').innerHTML=`<div class="info-item"><div class="item-title">${esc(it.title)}</div><div class="item-body">${esc(it.body)}</div>${it.takeaway?`<div class="bullets" style="margin-top:8px">💡 ${esc(it.takeaway)}</div>`:''}<div style="font-size:11px;color:var(--sub);margin-top:8px">⚠️ 仅作财商科普，不构成任何投资建议。</div></div>`;
+}
+
+/* ========== 书摘 ========== */
+function renderQuote(){
+  const idx=di(quoteDB.length),it=quoteDB[idx];
+  document.getElementById('quoteContent').innerHTML=`<div class="quote">${esc(it.text)}</div><div class="quote-src">—— ${esc(it.source)}</div>${it.note?`<div style="font-size:12px;color:var(--sub);margin-top:8px;line-height:1.7">💭 ${esc(it.note)}</div>`:''}`;
+}
+
+/* ========== 日记 ========== */
+function saveDiary(){
+  const t=tk(),text=document.getElementById('diaryText').value.trim();if(!text)return;
+  if(!data.diary[t])data.diary[t]=[];
+  data.diary[t].push({time:new Date().toLocaleTimeString('zh-CN',{hour:'2-digit',minute:'2-digit'}),text});
+  sv(data);document.getElementById('diaryText').value='';
+  loadDiary();
+}
+function loadDiary(){
+  const t=tk(),entries=data.diary[t]||[];
+  document.getElementById('diaryHist').innerHTML=entries.length?entries.slice().reverse().map(e=>`<div class="diary-entry"><div class="dh">📅 ${t} · ${e.time}</div><div class="db">${esc(e.text)}</div></div>`).join(''):'<div class="empty">今天还没有日记哦～写下第一笔吧 ✍️</div>';
+}
+
+/* ========== 历史 ========== */
+function setHistType(t){histType=t;document.querySelectorAll('#histModal .pill').forEach(p=>p.classList.toggle('on',p.dataset.ht===t));renderHist();}
+function renderHist(){
+  const list=document.getElementById('histList');list.innerHTML='';
+  if(histType==='todo'){
+    const scopes={day:'今日',week:'本周',month:'本月',year:'年度'};
+    for(const k in scopes){const a=data.todos[k]||[];if(a.length)list.innerHTML+=`<div style="font-weight:600;font-size:12px;margin-top:8px;color:#ff6b81">${scopes[k]}</div>`;a.forEach(it=>list.innerHTML+=`<div class="history-item">${it.done?'✅':'⬜'} ${esc(it.text)}</div>`);}
+  }else if(histType==='food'){
+    const keys=Object.keys(data.food).sort().reverse();
+    if(!keys.length){list.innerHTML='<div class="empty">无记录</div>';return}
+    keys.forEach(k=>{const a=data.food[k];const total=a.reduce((x,y)=>x+(Number(y.cal)||0),0);list.innerHTML+=`<div class="history-item"><b>${k}</b> 共 ${total} kcal<br>${a.map(x=>esc(x.name)+' '+x.cal+'kcal').join(' / ')}</div>`;});
+  }else if(histType==='fitness'){
+    const keys=Object.keys(data.fitness).filter(k=>data.fitness[k]).sort().reverse();
+    if(!keys.length){list.innerHTML='<div class="empty">无记录</div>';return}
+    keys.forEach(k=>list.innerHTML+=`<div class="history-item">${k} ✅ 健身打卡</div>`);
+  }else if(histType==='english'){
+    const keys=Object.keys(data.english).filter(k=>data.english[k]).sort().reverse();
+    if(!keys.length){list.innerHTML='<div class="empty">无记录</div>';return}
+    keys.forEach(k=>list.innerHTML+=`<div class="history-item">${k} ✅ 英语学习</div>`);
+  }else if(histType==='diary'){
+    const keys=Object.keys(data.diary).sort().reverse();
+    if(!keys.length){list.innerHTML='<div class="empty">无日记记录</div>';return}
+    keys.forEach(k=>{(data.diary[k]||[]).forEach(e=>list.innerHTML+=`<div class="diary-entry"><div class="dh">📅 ${k} · ${e.time}</div><div class="db">${esc(e.text)}</div></div>`);});
+  }
+  if(!list.innerHTML)list.innerHTML='<div class="empty">无记录</div>';
+}
+
+/* ========== 弹窗 ========== */
+function showModal(id){document.querySelectorAll('.modal').forEach(m=>m.classList.remove('show'));document.getElementById(id).classList.add('show');if(id==='histModal')renderHist();}
+function closeModal(id){document.getElementById(id).classList.remove('show')}
+
+/* ========== 每日索引 ========== */
+function di(len){const t=tk().replace(/-/g,'');return parseInt(t,10)%len;}
+
+/* ========== 初始化 ========== */
+function init(){
+  const now=new Date();
+  document.getElementById('todayDate').textContent=now.toLocaleDateString('zh-CN',{month:'long',day:'numeric',weekday:'short'});
+  const h=now.getHours();let g='早上好';if(h>=12)g='下午好';if(h>=18)g='晚上好';
+  document.getElementById('greet').textContent=`${g}呀～ 小仙女操盘手 🎀 今日待办先过一遍叭 👇`;
+  switchPanel('task');
+}
+
+/* ========== 内容库 ========== */
+const homeCleanDB=[
+  {tag:'new',title:'家清类目新规：清洁剂需标注"成分安全信息"，2025年强制执行',
+   body:'市场监管总局发布《家用清洁剂标签规范》，要求2025年起所有家清产品（洗衣液、厨卫清洁剂、消毒液）必须在包装显著位置标注完整成分表及风险提示，含"次氯酸钠""表面活性剂"等成分需单独列出浓度范围。电商详情页同步需上传成分安全信息，否则商品将被下架。\n\n影响范围：家清类目约60%的中小品牌详情页需重新制作。头部品牌（蓝月亮、威露士、立白）已提前完成合规改造，中小商家需在过渡期内补齐。\n\n实操要点：①优先改造销量TOP10的SKU；②成分表按"成分名称+含量区间+作用"三栏呈现，比纯文字更易过审；③详情页增加"安全使用说明"板块，反而能提升转化（用户对家清产品的安全性敏感度远高于价格）。',
+   bullets:['2025年家清标签新规强制标注完整成分表','详情页需上传成分安全信息，60%中小品牌要改造','优先改TOP10 SKU，用"名称+含量+作用"三栏呈现']},
+  {tag:'tip',title:'洗衣凝珠为什么成了家清第一大爆品？拆解它的内容打法',
+   body:'洗衣凝珠从2019年进入中国到2024年占据洗衣品类约25%份额，核心是"内容驱动品类教育"。它的爆发逻辑：①视觉冲击强——五颜六色的凝珠、遇水即溶的画面天然适合短视频；②使用门槛高——很多人不知道怎么用，教学类内容天然有需求；③单价利润高——一颗凝珠成本约1元、售价3-4元，毛利远高于洗衣液。\n\n直播间玩法：用"溶解实验"现场演示（放入水中快速融化），叠加"一颗搞定一桶衣服"的省心卖点，转化率可达8%以上。短视频则主打"凝珠vs洗衣液用量对比"，用对比制造冲突。\n\n⚠️ 风险：凝珠属于浓缩型产品，若被儿童误食风险高，包装必须做儿童安全锁，直播间不得宣称"可食用级"等违规话术。',
+   bullets:['凝珠靠"视觉冲击+使用教学"的内容驱动品类教育','直播间用溶解实验演示，转化率可达8%+','包装必须儿童安全锁，禁止误导性话术']},
+  {tag:'data',title:'家清赛道数据：抖音家清GMV增速超40%，但退货率是隐形炸弹',
+   body:'2025年上半年数据显示，抖音家清类目GMV同比增长约43%，是所有快消子类目中增速最快的之一。但家清类目退货率普遍在15-25%，显著高于美妆的8-12%，原因是"到手与预期不符"——用户看到视频里的去污效果，收到货后发现效果一般。\n\n降低退货率的三个动作：①短视频/直播展示真实使用场景，不要用夸张特效（如"一喷即净"），退货的核心来源就是预期落差；②详情页用"适用范围"明确写出不能处理的情况（如"不适合真皮、不能用于铝制品"），减少误购；③发货时附赠小样试用装，让用户先试小面积，降低一次性退货。\n\n数据参考：某家清品牌通过"真实场景+适用范围说明"，退货率从22%降到13%，净利润率提升约4个百分点。',
+   bullets:['家清GMV增速40%+，但退货率15-25%远高于美妆','降低退货=真实场景展示+明确适用范围','附赠小样可显著降低退货率']},
+  {tag:'tip',title:'家清产品短视频素材：去污对比类最稳，但要做"真对比"',
+   body:'家清类短视频中，播放量和转化最稳的是"去污对比"类——脏污布/油烟机/水垢处理前后对比。这类素材结构：前3秒展示"脏"（制造痛点）→中间展示产品使用过程→结尾展示"净"（结果冲击）。\n\n但要注意"真对比"：2025年平台严查伪造对比效果，用酱油/咖啡渍现场演示可，用特效"变干净"则违规。真实去污过程哪怕效果没那么夸张，完播率反而更高，因为用户能感知到"真实"。\n\n进阶玩法：针对细分场景做垂直内容——"租房党必看的厨房油污""宝妈必看的宝宝餐椅清洁""养宠家庭的地板清洁"，细分场景的转化率通常是泛场景的2-3倍。',
+   bullets:['去污对比类最稳：脏→使用→净三段式','2025严查伪造对比，真实过程完播率反而高','细分场景（租房/宝妈/养宠）转化率是泛场景的2-3倍']},
+  {tag:'risk',title:'家清直播风险提示：这3类话术正在被严查',
+   body:'家清类目直播有三类高风险话术：\n\n①杀菌类——"99.9%杀菌""杀灭所有细菌"必须有第三方检测报告支持，且不得暗示"可杀病毒"（除特殊资质）；\n②绝对化——"最强的去污力""市面上最好用的洗衣液"违反广告法，可用"强力去污""深受用户认可"替代；\n③误导性用途——洗衣液不得宣称"可用于餐具清洗"，消毒液不得宣称"可直接接触皮肤"，跨用途宣称是重点监管对象。\n\n合规替代方案：用检测报告说话（"经SGS检测，对金黄色葡萄球菌杀灭率99.9%"）、用限定词降低风险（"针对常见油污效果明显"）、用场景替代功效（"厨房重油污，喷一喷静置5分钟再擦"）。',
+   bullets:['杀菌话术必须有检测报告，"99.9%"不能随便说','绝对化用语（最强/最好）违反广告法','严禁跨用途宣称，洗衣液不能说能洗碗']},
+  {tag:'case',title:'案例拆解：一个家清新品牌如何在抖音3个月做到月销500万',
+   body:'某家清新品牌（主打洗衣凝珠+厨房清洁）的抖音起盘路径：\n\n第1个月——内容测试期。发布30条短视频，聚焦"租房厨房清洁"细分场景，测试出2个爆款框架（"油污对比"和"省心教程"），完播率最高的达38%。\n\n第2个月——达人分发期。不投品牌自播，而是找50个中小达人（1-10万粉）寄样合作，按佣金分成。达人视频带来自然流量，单月GMV约80万，验证了产品的自然转化能力。\n\n第3个月——自播放量期。搭建品牌自播间，用已验证的爆款框架做直播素材，配合微付费投放（日预算500-1000元），单月GMV突破500万。\n\n核心启示：新品牌起盘不要一上来就自播砸钱，先用短视频测试内容框架、用达人验证产品力，跑通后再放量，能大幅降低试错成本。',
+   bullets:['第1月测试内容→第2月达人验证→第3月自播放量','先用50个中小达人验证产品力，成本远低于自播','爆款框架复用能大幅降低放量期试错成本']},
+  {tag:'new',title:'视频号正在成为家清品牌的新增长点，年轻人开始"社区团购式"买家清',
+   body:'一个值得关注的变化：视频号家清类目的用户画像与抖音差异明显——视频号家清用户中35-55岁占比超60%，客单价更高（平均比抖音高约30%），且复购率高。原因是家清是"家庭采购"决策，视频号的社交信任链路（朋友推荐、熟人转发）更适合这类决策。\n\n打法差异：抖音家清靠"爆品+冲动购买"，视频号家清靠"囤货+信任复购"。视频号适合用"家庭装""组合装"做大客单，用社群做会员复购。\n\n实操：视频号直播用"家庭囤货节"形式，主推洗衣液/清洁剂的6瓶装、组合装，配合"满199减50"的囤货优惠；下播后用社群（企业微信）沉淀用户，每月固定"会员日"做复购。',
+   bullets:['视频号家清用户偏35-55岁，客单价高30%','抖音家清靠爆品冲动购买，视频号靠囤货信任复购','视频号适合用家庭装+社群做复购']},
+  {tag:'tip',title:'家清商品卡优化：搜索流量占比已超35%，标题决定生死',
+   body:'家清类目的搜索流量占比正在快速提升，目前约占类目总流量的35%（高于全类目平均）。因为家清是"计划性购买"——用户知道自己要买洗衣液/清洁剂，会直接搜索。\n\n标题优化公式：品类词+功效词+规格+场景。例："洗衣凝珠 深层去渍 8倍洁净 200颗家庭装 持久留香"。前15字必须包含"品类词+核心功效"，因为搜索结果只显示前15-20字。\n\n除了标题，家清商品卡还有两个关键：①主图突出"功效可视化"——如"一泵用量对比图""去污前后对比图"，比纯产品图点击率高40%+；②SKU命名清晰——"3kg装/5kg装/10kg装"要明确标注，家清用户对规格敏感，规格混乱会导致误购退货。',
+   bullets:['家清搜索流量占比35%+，标题公式=品类+功效+规格+场景','主图用功效可视化（用量/对比），点击率高40%','SKU规格标注清晰，家清用户对规格最敏感']},
+  {tag:'tip',title:'家清赛道选品机会：这三类细分产品正在快速增长',
+   body:'根据2025年上半年数据，家清赛道有三个细分方向增速突出：\n\n①宠物清洁——养宠家庭的地板清洁、除味喷雾、宠物尿垫，增速超80%。养宠人群对价格不敏感、复购稳定。\n②母婴专用——婴儿洗衣液、奶瓶清洁剂、玩具消毒喷雾，增速约60%。宝妈对"安全无害"的付费意愿高，客单价是普通家清的2-3倍。\n③懒人清洁——一次性拖把、洁厕宝、管道疏通剂等"免手洗"产品，增速约50%。契合年轻人的"懒人经济"。\n\n选品建议：不要做泛家清（洗衣液、洗洁精已有巨头），要做细分场景的"小而美"，用内容精准触达目标人群，避开与巨头的正面竞争。',
+   bullets:['宠物清洁增速80%+，母婴专用60%+，懒人清洁50%+','宝妈和养宠人群付费意愿高、复购稳定','避开泛家清红海，做细分场景小而美']},
+  {tag:'tip',title:'家清直播间"家庭场景化"打法：从卖产品到卖解决方案',
+   body:'家清直播的进阶打法是"场景化"——不卖单品，卖"家庭清洁解决方案"。比如不单独卖洗衣液，而是推出"租房党清洁套装"（洗衣液+地板清洁+玻璃清洁）、"宝妈安心套装"（婴儿洗衣液+玩具消毒+奶瓶清洁）。\n\n为什么有效？①套装客单价高（通常是单品的2-3倍）；②场景化降低决策难度（用户不用自己搭配）；③套装内单品可以互相引流（用过洗衣液觉得好，会复购套装内其他产品）。\n\n直播间呈现：用真实的家庭场景做背景（厨房/卫生间/儿童房），现场演示套装里每个产品的使用，让用户"看到自己的家"。某家清品牌用"场景套装"打法，客单价从59元提升到168元，毛利额翻倍。',
+   bullets:['卖解决方案而非单品，客单价是单品2-3倍','场景套装（租房/宝妈）降低决策难度','真实家庭场景做直播背景，让用户"看到自己的家"']}
+];
+const personalCareDB=[
+  {tag:'new',title:'个护新规：牙膏、洗发水纳入"功效宣称备案"管理，违规最高罚50万',
+   body:'国家药监局发布新规，将牙膏、洗发水、沐浴露等个护产品纳入功效宣称备案管理。凡宣称"美白""防脱""去屑""抗敏"等功效的产品，必须提交功效评价报告并完成备案，未备案不得宣称。\n\n影响：市面约70%的个护产品需要重新梳理宣称。以前"随便说"（如洗发水说"防脱生发"）的时代结束了。违规最高可罚50万元并全网下架。\n\n应对建议：①盘点现有SKU的功效宣称，有报告的支持的保留，无报告的下架或改宣称；②"去屑""控油""柔顺"等基础功效相对好备案，"生发""美白""抗敏"等高阶功效需完整临床/功效报告；③直播间话术同步整改，主播口播也算宣称，违规同样处罚。',
+   bullets:['牙膏/洗发水/沐浴露功效宣称需备案','70%产品要整改，违规最高罚50万','主播口播也算宣称，直播间话术要同步整改']},
+  {tag:'tip',title:'个护赛道最赚钱的品类：防脱洗发水为什么能撑起百亿市场？',
+   body:'防脱洗发水是个护赛道最特殊的品类——它同时踩中了"焦虑"和"高频"两个点。中国脱发人群超2.5亿，且年轻化明显（30岁以下占约60%），这带来了巨大的焦虑需求；而洗发水又是高频消耗品（1-2个月一瓶），复购天然稳定。\n\n品类特点：①客单价高——防脱洗发水单价通常是普通洗发水的2-3倍（80-150元）；②复购率高——用户一旦"觉得有效"就会长期复购；③内容驱动——"脱发困扰"是天然的内容素材，短视频/直播的转化效率高。\n\n⚠️ 合规红线：2024年起"防脱"属于特殊功效，必须有备案报告，且不得宣称"生发""根治"。合规的表述是"改善头皮环境""减少断发"。',
+   bullets:['脱发人群2.5亿且年轻化，焦虑+高频=黄金品类','客单价是普通洗发水2-3倍，复购稳定','"防脱"需备案，禁止宣称"生发/根治"']},
+  {tag:'tip',title:'个护直播的核心：功效演示 + 情绪共鸣，缺一不可',
+   body:'个护产品和家清不同，它的购买决策更"感性"——用户买的不只是功能，还有"变美/变好"的期待。所以个护直播要同时做两件事：\n\n①功效演示——洗发水现场洗、护肤品现场涂、牙膏现场刷，让用户"看到效果"。比如控油洗发水，现场洗后展示"发根蓬松、出油变慢"。\n②情绪共鸣——主播要会讲"痛点故事"："每次洗完头两小时就油了，是不是你？""头皮痒到抓出血，是不是你？"让用户产生"这就是我"的代入感。\n\n优先级：个护直播里，情绪共鸣的转化贡献约60%，功效演示约40%。先让用户"共情"，再展示"效果"，转化率能提升2-3倍。',
+   bullets:['个护购买决策偏感性，情绪共鸣比功效演示更重要','痛点故事（"是不是你？"）制造代入感','先共情再展示效果，转化率提升2-3倍']},
+  {tag:'data',title:'个护赛道数据：国货品牌崛起，抖音个护TOP10中国货占7席',
+   body:'2025年上半年抖音个护类目TOP10品牌中，国货占7席（珀莱雅、韩束、丸美、自然堂等）。国货个护崛起的核心原因是"更懂抖音的内容逻辑"——国货新品牌大多从抖音起盘，天生适应短视频/直播的打法，而国际大牌（宝洁、联合利华）的传统货架优势在内容电商里被削弱。\n\n国货个护的内容打法：①成分党叙事——"烟酰胺""377""玻色因"等成分词自带流量和信任；②大牌平替——"和XX大牌同成分，价格只要1/3"；③国潮情绪——"支持国货""东方美学"的情绪价值。\n\n给中小商家的启示：个护赛道的机会在细分——大牌覆盖不到的细分需求（油皮专用、敏感肌专用、熬夜党专用）反而是国货和中小品牌的机会。',
+   bullets:['抖音个护TOP10国货占7席，国货更懂内容逻辑','三大叙事：成分党、大牌平替、国潮情绪','机会在细分需求：油皮/敏感肌/熬夜党专用']},
+  {tag:'risk',title:'个护直播合规红线：美白、生发、激素类宣称是重灾区',
+   body:'个护类是直播违规的高发区，三类宣称风险最高：\n\n①美白类——"美白"属于特殊化妆品功效，需特证（国妆特字），普通备案的护肤品不得宣称美白，可用"提亮""匀净肤色"替代。\n②生发类——洗发水属于普通化妆品，严禁宣称"生发""育发""增加发量"，可用"改善头皮""减少掉发（断发）"等合规表述。\n③激素类——任何暗示"快速见效""几天内改善"的话术都要警惕，可能被判定为暗示激素，可用"坚持使用""循序渐进"替代。\n\n此外，主播试色、试用的产品必须有正规备案，三无产品/自制产品一律不能上直播（涉及生产许可和产品安全）。个护类目一旦被查，处罚力度比家清更重（涉及人身安全）。',
+   bullets:['美白需特证，普通护肤品只能讲"提亮"','洗发水禁止说"生发/育发"，可讲"减少断发"','避免"快速见效"等暗示激素的话术']},
+  {tag:'case',title:'案例拆解：一个氨基酸洗面奶品牌如何靠"成分科普"月销破千万',
+   body:'某国产氨基酸洗面奶品牌的内容打法是"以教代销"——把产品卖点翻译成用户听得懂的成分科普：\n\n内容策略：①发布"氨基酸vs皂基洗面奶有什么区别"科普视频，不讲产品只讲知识，单条播放破500万；②"敏感肌洗脸的3个误区"系列，每条结尾自然带出产品；③直播中主播是"成分党人设"，用成分表讲解产品，而非叫卖。\n\n转化逻辑：先用科普建立"专业信任"，再自然转化。该品牌复购率超过40%，显著高于行业平均的25%。\n\n关键启示：个护（尤其是护肤）的用户越来越专业，粗暴叫卖的转化率在下降。"专业人设+成分科普"的内容模式，虽然起量慢，但用户粘性和复购更高，长期ROI更优。',
+   bullets:['"以教代销"：用成分科普建立专业信任','不作直接推荐，科普内容自然带出产品','专业人设复购率40%+，高于行业平均25%']},
+  {tag:'tip',title:'个护礼盒经济：节日营销如何把客单价翻3倍',
+   body:'个护是"礼物属性"最强的快消品类之一——护肤品、香水、洗发套装都适合送礼。节日（情人节、母亲节、教师节、618/双11）是个护礼盒的黄金节点。\n\n礼盒打法：①组合装——把明星单品+小样组合成礼盒，包装升级，客单价提升2-3倍；②场景化命名——"七夕心动礼盒""妈妈宠爱护肤礼盒"，用场景替代产品名；③仪式感包装——礼盒的包装成本增加不多，但对"送礼"场景是刚需，复购和口碑更好。\n\n直播间呈现：礼盒要突出"开箱仪式感"——现场打开礼盒、展示每层的内容、强调"送人很有面子"。某护肤品牌的情人节礼盒，客单价从238元提升到698元，礼盒销量占总销量40%。',
+   bullets:['个护是"礼物属性"最强的快消品类之一','组合装+场景命名+仪式感包装，客单价翻2-3倍','直播突出"开箱仪式感"，送礼场景转化高']},
+  {tag:'tip',title:'个护小样经济：为什么"小样+正装"组合是最强的转化工具',
+   body:'个护行业有一个公认的转化逻辑："先试用，再购买"。因为个护（尤其护肤）的购买决策风险高（怕过敏、怕不适合肤质），"小样"能大幅降低决策门槛。\n\n玩法：①买正装送小样——最常见的组合，让用户"先试后用"；②小样引流——用低价小样（9.9元）做引流品，吸引用户体验后复购正装；③小样套装——把多个明星单品的小样组合成"体验套装"，一次性让用户体验全系列，为后续复购做铺垫。\n\n直播间玩法：把"买正装送一堆小样"作为核心利益点，用户算下来"小样价值超过正装"，产生"超值"感。某护肤品牌靠"买1送8"（1个正装+8个小样）的话术，把单场转化率从3%提升到7%。',
+   bullets:['个护决策风险高，小样是降低门槛的最强工具','买正装送小样、低价小样引流、小样套装三种玩法','"小样价值>正装"制造超值感，转化率翻倍']},
+  {tag:'tip',title:'个护赛道选品：口腔护理和身体护理是被低估的两个方向',
+   body:'个护赛道里，大多数商家盯着护肤（竞争最激烈），但有两个方向被明显低估：\n\n①口腔护理——牙膏、电动牙刷、漱口水、牙贴。中国口腔护理市场增速约20%，且客单价在提升（电动牙刷、冲牙器等高客单产品增长快）。口腔护理内容化程度高（"牙齿美白""口气清新"都是强需求素材）。\n②身体护理——身体乳、磨砂膏、足膜、身体精油。随着"全身护肤"理念普及，身体护理增速约35%，且竞争远小于面部护肤。\n\n选择逻辑：避开面部护肤的红海（大牌林立、成分内卷），在口腔/身体护理这两个"大牌覆盖不足+需求增长快"的方向做细分，成功率更高。',
+   bullets:['口腔护理增速20%+，电动牙刷等高客单产品增长快','身体护理增速35%+，竞争远小于面部护肤','避开面部护肤红海，做口腔/身体护理细分']},
+  {tag:'tip',title:'个护短视频爆款公式：痛点开场+过程展示+效果对比',
+   body:'个护短视频最稳的爆款公式是三段式：\n\n①痛点开场（前3秒）——直接戳中用户痛点。"头发出油塌成一片怎么办？""脸上的痘印遮都遮不住"——让目标用户3秒内认出"这就是我"。\n②过程展示（中间）——展示产品使用过程，但要"有质感"。个护是"悦己"品类，画面要干净、光线要柔和、手法要专业，粗糙的展示会拉低产品调性。\n③效果对比（结尾）——使用前后的对比，如"控油前后发根对比""涂抹前后皮肤光泽对比"。对比要真实，不要过度磨皮/修图（平台会识别）。\n\n进阶：个护短视频要突出"人设"——护肤博主、成分党、皮肤科医生等专业人设的转化率，明显高于泛人设。',
+   bullets:['三段式：痛点开场+过程展示+效果对比','个护是"悦己"品类，画面质感直接影响转化','专业人设（成分党/皮肤科）转化率高于泛人设']}
+];
+const fmcDB=[
+  {tag:'new',title:'快消品新规：包装"过度包装"专项整治启动，食品/日化首当其冲',
+   body:'市场监管总局启动快消品过度包装专项整治，重点针对食品、日化类的"包装比产品大""多层礼盒""空隙率超标"。新规要求：包装空隙率不得超过国家标准的限定值，包装层数不得超过3层，包装成本不得超过产品售价的20%。\n\n影响：礼盒类快消产品（食品礼盒、日化礼盒）是整顿重点。违规产品将被要求下架整改，并可能面临罚款。\n\n实操建议：①排查现有礼盒类产品，测算空隙率和包装成本占比；②过度包装的礼盒改为"简约包装+产品升级"，把包装成本省下来的钱投入到产品品质或价格上；③新包装设计遵循"3层以内+空隙率达标"，避免再次违规。简约包装反而契合年轻人"反浪费"的消费趋势，是可借势的营销点。',
+   bullets:['快消过度包装专项整治：3层以内+空隙率达标','礼盒类食品/日化是整顿重点','简约包装可借势"反浪费"趋势做营销']},
+  {tag:'tip',title:'快消品类的核心打法：高频刚需+囤货逻辑，客单价提升的关键',
+   body:'快消（快速消费品）的本质是"高频刚需"——用户会反复购买，但单次客单价低。所以快消打法的核心不是"提高单次客单价"，而是"提高购买频次+囤货客单"。\n\n囤货逻辑：快消直播最爱用"组合装""家庭装""囤货装"——如"6瓶洗衣液""12包纸巾""10袋咖啡"。用户一次性买够半年的量，客单价从单件的30元提升到组合的150元。\n\n为什么囤货有效？①快消是必需品，用户本来就要买；②组合装单价更低，用户觉得"划算"；③一次性解决，符合快消"省心"的消费心理。\n\n直播间话术："这个价格错过了要等一年""囤够用到明年"——用稀缺性+囤货利益点，推动用户一次性大额购买。',
+   bullets:['快消核心是高频刚需，靠囤货提升客单价','组合装/家庭装把客单价从30元提到150元','用稀缺性话术推动一次性囤货购买']},
+  {tag:'data',title:'快消赛道数据：直播电商占快消线上销售比例已超45%',
+   body:'2025年上半年数据，快消品的线上销售中，直播电商占比已超过45%（2022年约25%）。意味着直播已成为快消品类的第一大线上渠道。\n\n渠道特点对比：①传统货架（天猫/京东）——用户主动搜索，适合计划性购买；②直播电商——算法推荐+冲动购买，适合囤货和尝鲜；③即时零售（美团/京东到家）——30分钟送达，适合应急购买。\n\n快消品牌的渠道策略：三种渠道要协同而非割裂。直播做"拉新+囤货"，货架做"复购+搜索"，即时零售做"应急+高频"。某纸巾品牌通过三渠道协同，整体线上GMV提升约60%。',
+   bullets:['快消线上销售中直播占比超45%，成第一大渠道','直播拉新囤货，货架复购搜索，即时零售应急','三渠道协同，整体GMV可提升60%']},
+  {tag:'tip',title:'快消品的内容电商打法：从"卖产品"到"卖生活方式"',
+   body:'快消品同质化严重（纸巾、洗衣液、饮料的功能差异很小），所以内容电商的破局点是"卖生活方式"而非"卖产品功能"。\n\n举例：纸巾不强调"3层加厚"，而强调"出租屋也要有生活质感"；咖啡不强调"醇香"，而强调"打工人的续命仪式感"；洗衣液不强调"去污强"，而强调"给家人安心呵护"。\n\n为什么有效？因为快消产品的功能差异用户感知不强，但"使用场景+情绪价值"能制造差异。同样的纸巾，讲"生活质感"就是比讲"3层加厚"更打动人。\n\n执行：先确定产品的"生活方式标签"（质感/安心/仪式感/省钱），所有内容围绕这个标签展开，形成统一的品牌调性。',
+   bullets:['快消同质化严重，破局点是卖生活方式','纸巾讲"生活质感"，咖啡讲"续命仪式感"','先定"生活方式标签"，所有内容围绕它展开']},
+  {tag:'risk',title:'快消直播风险：临期、虚假促销、赠品是三大违规高发点',
+   body:'快消类直播有三类高频违规：\n\n①临期产品——食品/日化类临期产品必须在直播中明确标注"临期"，且不得与原价产品混卖。用"清仓""尾货"名义卖临期而不标注，属于欺诈。\n②虚假促销——"原价199现价99"必须以真实的历史成交价为基准，虚构原价属于价格欺诈。快消品价格波动大，很多商家"常年打折"，其"原价"其实从未成交过，属于违规。\n③赠品合规——赠品也需有完整标签、生产日期、合格证，不得赠送无标签/过期产品。快消直播常送小样/赠品，赠品合规最容易忽视。\n\n合规建议：临期产品单独设专区明示；促销价基于真实成交价（可保留30天价格记录）；赠品同样按正品标准管理。',
+   bullets:['临期产品必须明确标注，不能混卖','"原价"需真实成交过，虚构原价属价格欺诈','赠品也要有标签生产日期，按正品管理']},
+  {tag:'case',title:'案例拆解：某国货饮料品牌如何靠"场景+情绪"做到单场GMV破百万',
+   body:'某新锐气泡水品牌的内容电商起盘打法：\n\n内容策略——不做"解渴"的功能诉求，而是做"情绪饮料"。短视频围绕"加班续命""健身后来一瓶""追剧搭档"等场景，把气泡水塑造成"情绪陪伴"。\n\n直播打法——直播间布置成"居家场景"（沙发、冰箱、投影），主播像"朋友聊天"一样自然推荐，而非叫卖。用"现在下单今晚就能喝到"的即时满足感促单。\n\n达人矩阵——找健身博主、职场博主、美食博主做场景化种草，每个达人对应一个使用场景，覆盖不同人群。\n\n结果：起盘3个月，单场直播间GMV破百万，复购率约35%。核心启示：快消饮料的红海竞争里，功能诉求打不动人，场景+情绪才能建立差异化。',
+   bullets:['不做功能诉求，做"情绪饮料"（续命/陪伴）','直播间布置成居家场景，像朋友聊天一样推荐','达人矩阵每个达人对应一个使用场景']},
+  {tag:'tip',title:'快消选品黄金法则：高频、刚需、复购、低决策',
+   body:'快消选品的四个黄金标准：\n\n①高频——使用频率越高越好（纸巾、洗护、饮料都是高频）；②刚需——是生活必需，不是"可有可无"（这决定了用户是否会主动搜索）；③复购——用完还会再买（快消的核心价值在复购，而非首单）；④低决策——用户不需要"深思熟虑"就下单（快消品类决策成本低，适合冲动购买）。\n\n相反的"坑"：低频（如特殊清洁工具）、非刚需（如网红小家电，不算快消）、高决策（如大额耐用品）。这些品类不适合快消的打法。\n\n选品验证：看一个快消产品好不好，就问四个问题——用户多久用一次？不用会怎样？用完会再买吗？买的时候会纠结吗？四问都通过，就是好快消品。',
+   bullets:['四标准：高频、刚需、复购、低决策','快消价值在复购而非首单','选品四问：多久用？不用会怎样？会复购？会纠结？']},
+  {tag:'tip',title:'快消短视频"开箱囤货"内容：最容易出爆款的快消形式',
+   body:'快消类短视频中，"开箱囤货"是最容易出爆款的形式之一。因为它满足了用户的两种心理：①好奇心（看你买了什么）；②代入感（我也想囤这么多）。\n\n形式：博主一次性开箱大量同品类产品（如"我囤了半年的纸巾""双11囤的30瓶洗护"），一边拆一边讲"为什么囤这么多""如何用更省"。\n\n转化逻辑：用户看到"别人囤了这么多"，会产生"我也需要囤"的冲动。配合"链接在评论区""这个价格必须囤"的引导，转化率高。\n\n进阶：快消开箱要突出"性价比对比"——"这一堆才花了XX元"，用价格冲击强化"划算"感知。某纸品品牌靠"开箱囤货"内容，单条视频带货约20万单。',
+   bullets:['"开箱囤货"满足好奇心+代入感，最易出爆款','突出"这一堆才花了XX元"的性价比冲击','配合"链接在评论区"引导即时转化']},
+  {tag:'tip',title:'快消品牌自播 vs 达人分发：新品牌该选哪条路？',
+   body:'快消新品牌起盘有两条路：品牌自播与达人分发。\n\n品牌自播——自己搭直播间、自己出内容。优势：可控、沉淀品牌资产、利润高；劣势：起量慢、需要内容能力和人力投入。适合：有内容团队、想长期做品牌的商家。\n\n达人分发——找达人合作带货，按佣金分成。优势：起量快、借达人流量、试错成本低；劣势：利润被分佣压缩、品牌资产沉淀在达人而非自己、达人可能转向竞品。适合：供应链强、想快速验证产品的商家。\n\n最佳策略：先达人验证——用达人测试产品是否有自然转化力（避免盲目自播砸钱）；再自播沉淀——验证成功后搭建自播，把流量和用户沉淀为自己的品牌资产。某快消新品牌用"先达人后自播"，6个月完成从0到月销300万。',
+   bullets:['自播沉淀品牌资产，达人分发快速起量','先达人验证产品力，再自播沉淀用户','达人试错成本低，避免盲目自播砸钱']},
+  {tag:'tip',title:'快消品私域复购：把"一次成交"变成"长期客户"的关键',
+   body:'快消的利润大头在复购，而私域（企业微信/社群）是快消复购的最佳阵地。因为快消是高频刚需，"提醒复购"本身就是价值。\n\n私域打法：①加微沉淀——直播/包裹卡引导加企业微信，送小样或优惠；②社群运营——按品类建群（如"囤货群""新品试吃群"），定期发福利；③会员日——每月固定日期做会员专属优惠，培养复购习惯；④周期提醒——快消有使用周期（如洗发水1-2个月用完），在用户"快用完"时推送复购优惠。\n\n数据参考：快消品牌私域用户复购率通常是公域用户的3-5倍，客单价也更高。私域是快消品牌最值得投入的长期资产，虽然慢，但复购价值巨大。',
+   bullets:['快消利润大头在复购，私域是复购最佳阵地','社群+会员日+周期提醒培养复购习惯','私域用户复购率是公域的3-5倍']}
+];
+const crossBorderDB=[
+  {title:'什么是跨境电商？四种模式全解析',body:'跨境电商就是把商品通过电商平台卖给海外消费者。核心模式有四种：\n\n①B2C零售（亚马逊、Temu、SHEIN、TikTok Shop）——直接卖给海外消费者，适合有供应链优势的卖家，利润较高但运营复杂度也高；\n②B2B批发（阿里国际站）——批量卖给海外批发商/零售商，客单价高但回款周期长；\n③DTC独立站（Shopify+Facebook/TikTok广告引流）——品牌自主可控，但需要自己搞定流量，适合有内容能力的团队；\n④全托管模式（Temu、SHEIN、速卖通全托管）——你只负责供货，平台负责运营/物流/售后，利润薄但门槛低，适合工厂型卖家或新手试水。\n\n当前趋势：全托管模式让跨境门槛大幅降低，但利润越来越薄；品牌化+DTC是长期方向，但需要时间和内容投入。新手建议从全托管试水供应链能力，再逐步向B2C/DTC升级。',tips:['别一上来就做独立站，没有流量来源就是"无人岛开店"','全托管利润薄但能快速验证产品力，适合第一站','选品比运营更重要——好产品自带流量，烂产品再投也救不回来'],task:'用一句话总结四种跨境电商模式的区别'},
+  {title:'亚马逊新手起步：从注册到上架的全流程',body:'亚马逊是跨境电商最大的平台，也是新手最常选的第一站。完整起步流程：\n\n①准备资料——营业执照（个体户/公司均可）、双币信用卡（Visa/Mastercard）、品牌商标（建议注册，避免跟卖和侵权风险）；\n②注册店铺——通过亚马逊全球开店官网注册，选择目标站点（美国站最大、日本站竞争较小、欧洲站需VAT税号）；\n③选品——用工具（Jungle Scout/Helium10）分析竞品数据，重点关注月销量、竞争度、利润率。选品标准：体积小/重量轻/不易碎/复购高/售后少/无专利风险；\n④Listing优化——标题（品牌+品类+核心词+卖点）、5点描述（每个卖点一行）、主图（纯白底+至少1000px）、A+页面（品牌备案后可用）、关键词（埋入Search Terms）；\n⑤物流——FBA（亚马逊仓储配送，省心但压资金）vs FBM（自发货，灵活但时效差）。新手建议从小件FBA开始。\n\n⚠️ 最大避坑：别一上来就铺货。先选3-5个产品深度打磨Listing，跑通后再扩品。侵权是新手第一大坑——上架前必须查商标/专利（USPTO官网可免费查）。',tips:['先做3-5个品深度打磨，跑通后再扩品','上架前必须查USPTO商标/专利，避免侵权封店','FBA小件起步最稳妥：轻/小/不易碎/高复购'],task:'亚马逊Listing优化的5个要素是什么？试着默写出来'},
+  {title:'Temu全托管 vs 半托管：选哪个更适合你？',body:'Temu是拼多多旗下的跨境电商平台，以极致低价策略横扫欧美市场。目前提供两种合作模式：\n\n全托管模式：你只负责供货（把货发到Temu国内仓），平台负责定价、运营、物流、售后。优势是门槛极低——不需要懂英文、不需要运营经验、不需要处理客服；劣势是利润被平台压缩（毛利率通常10-20%），且你对定价/库存没有控制权。适合：工厂型卖家、供应链能力强但无运营团队的新手。\n\n半托管模式：你负责海外仓备货+自主定价+运营，平台提供流量和交易服务。优势是利润更高（毛利率可达30-40%）、自主定价权、品牌可控；劣势是需要在海外仓备货（有库存风险）、需要运营能力。适合：有一定跨境经验、有海外仓资源的卖家。\n\n选择建议：新手从全托管开始跑通供应链和选品能力，3-6个月后如果单量稳定，再考虑切半托管提高利润。全托管本质上是用利润换确定性，对于验证产品力是最高效的方式。',tips:['全托管=用利润换确定性，适合验证产品力','半托管需要海外仓备货+运营能力，利润更高','全托管做3-6个月，单量稳定再考虑升级'],task:'全托管和半托管的核心区别是什么？用一句话回答'},
+  {title:'跨境电商物流全攻略：FBA/FBM/海外仓怎么选',body:'跨境物流是新手最容易踩坑的环节。三种主流方式的优劣对比：\n\n①FBA（亚马逊物流）——你把货发到亚马逊仓库，订单产生后亚马逊负责打包配送。优点：Prime会员免邮、时效快（2-3天）、退货由亚马逊处理、Listing有FBA标识转化率高；缺点：仓储费+配送费较贵、压货资金、长期滞销会被收长期仓储费。适合：动销快的小件产品。\n\n②FBM（自发货）——订单产生后你从国内发货给海外消费者。优点：无仓储费、灵活、适合测试新品；缺点：时效慢（7-20天）、退货麻烦、Listing没有Prime标识。适合：大件/低动销/测试期产品。\n\n③海外仓（第三方仓储）——把货提前备到海外第三方仓库，出单后从海外仓发货。优点：时效接近FBA（3-5天）、费用低于FBA、可服务多平台（亚马逊+TikTok+独立站）；缺点：需要提前备货（预测销量）、海外仓质量参差不齐。适合：多平台运营的成熟卖家。\n\n新手建议：小件选FBA、大件选FBM、多平台选海外仓。不要混用——同一产品FBA+FBM同时开容易导致库存混乱。',tips:['小件→FBA，大件→FBM，多平台→海外仓','别混用FBA+FBM卖同一产品，库存会乱','FBA长期仓储费是隐藏成本，滞销品及时清仓'],task:'FBA和FBM各适合什么类型的产品？列2个判断标准'},
+  {title:'跨境选品核心逻辑：好产品长什么样？',body:'选品是跨境电商最重要的一环，选对了事半功倍，选错了再努力也难盈利。好产品的6个标准：\n\n①体积小重量轻——物流成本占比低。理想产品：重量<500g、体积<30×20×10cm，首重运费控制在15元以内；\n②不易碎——破损率低。玻璃/陶瓷/精密电子慎选，除非有成熟的包装方案；\n③复购率高——一次获客多次变现。食品/日用品/宠物用品复购率天然高于家具/3C；\n④售后少——减少客服成本。产品简单、安装方便、使用场景清晰的产品售后率最低；\n⑤避开敏感货——带电（锂电池）/液体/粉末/食品/化妆品需特殊认证和物流渠道，新手慎碰；\n⑥利润空间——售价≥采购成本×3，扣除平台佣金（15%）+物流（15-20%）+广告（10-15%）后净利润率≥20%。\n\n选品工具推荐：Jungle Scout（亚马逊数据分析）、Google Trends（搜索趋势）、TikTok热搜（社交趋势）。新手选品先看数据再凭直觉，不要"我觉得会爆"。',tips:['好产品6标准：轻/小/不易碎/复购高/售后少/无专利风险','利润公式：售价≥采购价×3，净利率≥20%','先看数据再凭直觉，不要"我觉得会爆"'],task:'好产品的6个标准是什么？对照这6条，想想你身边有什么产品符合'},
+  {title:'汇率波动与跨境定价：如何锁住利润',body:'汇率是跨境电商最容易被忽视但影响最大的变量。人民币每升值1%，跨境卖家的利润就会缩水1%。定价策略需要预留汇率缓冲空间：\n\n①定价公式：售价=(采购成本+头程运费)÷(1-平台佣金率-广告费率-目标利润率)÷汇率。例如采购30元+运费10元，佣金15%、广告10%、目标利润25%，汇率7.2时售价约$9.7；\n②汇率缓冲：在定价时按当前汇率-3%计算（如当前7.2按7.0算），预留升值空间；\n③锁汇工具：银行远期结汇（锁定未来汇率）、跨境支付平台（连连/PingPong/WF）提供实时汇率+低手续费提现；\n④多币种策略：如果主要做美国站，提现时选择"美元暂存"而非立即结汇，在汇率有利时再换人民币。\n\n⚠️ 避坑：不要在汇率大跌时恐慌性提现，也不要在汇率大涨时盲目囤美元。设定一个"心理汇率"（如6.8-7.3区间），超过区间再操作。',tips:['定价时用"当前汇率-3%"预留缓冲空间','利用跨境支付平台的汇率工具，避免银行零售汇率','设定心理汇率区间，不在情绪化时操作'],task:'算一下：如果采购成本40元、运费15元、佣金15%、目标利润20%、汇率7.0，售价应该是多少美元？'},
+  {title:'知识产权避坑指南：商标/专利/版权',body:'跨境电商中知识产权侵权是最高发的封店原因，且一旦被封资金冻结+Listing清空，损失惨重。三大知识产权类型：\n\n①商标——品牌名、Logo、Slogan。上架前用USPTO官网（美国）或WIPO（全球）免费查询是否已被注册。即便是"不经意用了别人的品牌名"也算侵权；\n②外观专利——产品外观设计。很多"爆款"产品其实有外观专利保护，直接仿制会被告。用Google Patents搜索关键词+产品图对比；\n③版权——图片、文案。盗用别人的Listing图片/A+页面内容也是侵权。所有素材自己做或购买商用授权。\n\n防侵权三步走：①上架前查商标（USPTO）→②查专利（Google Patents）→③所有图片/文案原创。跟卖是最危险的操作——跟卖别人Listing=在别人的商标页面上卖你的货，几乎100%侵权。新手宁可开新Listing慢慢养，也不要去跟卖。',tips:['上架前必查：USPTO查商标 + Google Patents查专利','跟卖=在别人商标页上卖货，几乎100%侵权','所有图片/文案必须原创或购买商用授权'],task:'上架前必须查哪两个网站？分别查什么？'},
+  {title:'TikTok Shop内容电商：短视频+直播卖全球',body:'TikTok Shop是跨境电商增长最快的渠道，本质是"内容驱动电商"——不是人找货（搜索），而是货找人（推荐算法）。核心玩法：\n\n①短视频带货——用15-60秒短视频展示产品使用场景/效果对比/开箱体验，挂小黄车直接购买。食品/美妆/家居/服装类目最适合；\n②直播带货——真人出镜展示+实时互动+限时秒杀，转化率是短视频的3-5倍；\n③达人合作——找TikTok达人寄样品做开箱/测评视频，按佣金分成或一口价合作。达人视频自带信任背书，转化率远高于品牌自拍。\n\n⚠️ 各地政策差异大：美区需本土资质（美国公司+美国仓）、东南亚门槛低但客单价低、英区竞争较小适合测试。TikTok Shop的核心不是"你会不会做电商"，而是"你会不会做内容"——先学会拍爆款短视频，再考虑开店。',tips:['TikTok=内容电商，先会拍视频再开店','达人合作是最高效的起量方式，自带信任背书','美区需要本土资质，新手可从东南亚/英区试水'],task:'TikTok Shop和亚马逊最本质的区别是什么？用一句话总结'}
+];
+const englishDB=[
+  {en:'Could you run that by me again?',cn:'你能再说一遍吗？',usage:'开会时没听清，或需要对方重复某个要点。比"What?"更礼貌。发音重点：run that 连读为 run-that。'},
+  {en:'Let me get back to you on that.',cn:'我稍后回复你。',usage:'需要时间去查信息或确认，暂时给不了答案。比"I don\'t know"更专业。语调：get back to you 重音在 back。'},
+  {en:'I\'m tied up right now.',cn:'我现在忙不过来。',usage:'正在忙别的事，暂时无法处理。比"I\'m busy"更地道。发音：tied up 中 d 和 u 连读，听起来像 tie-dup。'},
+  {en:'That sounds like a plan.',cn:'听起来可行。',usage:'赞同对方提出的方案或建议。比"OK"更热情、更积极。重音在 plan 上。'},
+  {en:'Let\'s touch base tomorrow.',cn:'我们明天通个气。',usage:'约定明天简短沟通一下进度。常见于工作邮件结尾。touch base 是固定搭配，base 不发长音。'},
+  {en:'Can you walk me through it?',cn:'你能带我过一遍吗？',usage:'请对方逐步讲解流程或操作。walk through = 走一遍。发音：walk me through 连读为 walk-me-through。'},
+  {en:'I see your point.',cn:'我明白你的意思。',usage:'理解对方的观点（但不一定完全同意）。比"I understand"更口语。语调：point 微微上扬。'},
+  {en:'Let\'s keep it simple.',cn:'我们简单点。',usage:'建议不要把事搞复杂。项目启动或讨论跑偏时常用。keep it 连读为 kee-pit。'},
+  {en:'What\'s the timeline?',cn:'时间线是怎样的？',usage:'问项目的截止日期和关键节点。比"When is the deadline?"更全面。重音在 time 上。'},
+  {en:'I\'ll take it from here.',cn:'接下来交给我。',usage:'接手后续工作，让对方放心。表示自信和负责。语调：take it 连读，here 降调表示确定。'},
+  {en:'No rush, take your time.',cn:'不着急，慢慢来。',usage:'告诉对方不用赶，从容完成。体现耐心和善意。rush 发音注意 r 和 sh 之间的过渡。'},
+  {en:'That\'s a good call.',cn:'这个决定不错。',usage:'认可对方的判断或决定。比"good idea"更正式一点。call 在这里=decision。'},
+  {en:'I\'m on the same page.',cn:'我跟你想的一样。',usage:'表示观点一致。on the same page = 在同一页上=共识。page 长元音，不要发成短音。'},
+  {en:'Let\'s circle back later.',cn:'我们回头再聊。',usage:'当前讨论先暂停，之后再回到这个话题。比"talk later"更商务。circle back = 绕回来。'},
+  {en:'Does that make sense?',cn:'这样说得通吗？',usage:'确认对方是否理解了你的解释。比"Do you understand?"更友好。语调：结尾上扬表示疑问。'}
+];
+const financeDB=[
+  {title:'应急金：理财的第一步不是投资，是存钱',body:'很多人的理财误区是"我要学投资赚钱"，但实际上理财的第一步是建立应急金——存够3-6个月的生活费，放在随时能取的地方（如货币基金、活期理财）。\n\n为什么应急金比投资更重要？因为生活中总有意外：失业、生病、车子维修、家人急用钱。如果没有应急金，你就被迫在股市低点割肉、刷信用卡透支、向亲友借钱——每一步都会让你之前的理财成果归零。\n\n具体做法：算一下每月固定支出（房租/房贷+吃饭+交通+基本开销），乘以3-6，这就是你的应急金目标。比如月支出5000元，应急金目标=1.5万~3万。先把这笔钱存够，再考虑投资。\n\n存哪里？货币基金（余额宝/零钱通）、银行活期理财、大额存单（阶梯到期法）。原则：①随时能取；②本金安全；③有点利息更好但不强求。',takeaway:'先存3-6个月生活费作为应急金，再考虑投资。这1.5-3万块钱，是你所有理财行为的安全垫。'},
+  {title:'复利：时间是你最被低估的资产',body:'复利被爱因斯坦称为"世界第八大奇迹"。简单说就是"利滚利"——本金产生的利息，下一期也加入本金继续产生利息。\n\n一个简单的例子：每月定投1000元，年化收益率7%（沪深300长期平均收益约7-10%），20年后总投入24万，但账户价值约52万——多出来的28万就是复利帮你赚的。同样的月投1000元，如果从25岁开始投到60岁（35年），账户约185万；如果从35岁开始（25年），只有约85万。晚10年差100万，这就是复利的威力。\n\n普通人如何利用复利？①越早开始越好，哪怕每月只投500元；②选择宽基指数基金（沪深300、中证500、标普500），不追个股和热点；③坚持定投，市场跌了反而能买更多份额，长期来看拉低成本。',takeaway:'每月定投1000元，年化7%，20年变52万。关键不是投多少，而是从多早开始。今天就开始，哪怕500元。'},
+  {title:'保险避坑指南：先保大风险，再保小风险',body:'保险是普通人理财的"防守端"，但80%的人买错了保险——不是买贵了，而是买了不该买的类型。\n\n保险配置的正确顺序：①百万医疗险（年保费300-500元，报销大病住院费用，保额200-400万）→②意外险（年保费100-200元，保意外身故/伤残/医疗）→③定期寿险（年保费500-1000元，家庭经济支柱必备，万一离世家人能拿一笔钱）→④重疾险（年保费2000-5000元，确诊大病一次性赔一笔钱，用于治疗+康复期间的生活费）。\n\n常见踩坑：①返还型保险——"没事返本"听起来很美，但保费比消费型贵2-3倍，多交的钱拿去理财比返本赚得多；②分红型保险——保障和理财混在一起，两者都做不好，保障额度低、收益也不高；③给孩子买一堆保险，自己却"裸奔"——家庭经济支柱才是最大的风险来源，先保大人再保小孩。\n\n一句话口诀：先百万医疗+意外，再定期寿险+重疾；返还型/分红型不买；先保赚钱的人。',takeaway:'保险顺序：百万医疗→意外→定期寿险→重疾。返还型和分红型不要买。先保家庭经济支柱。'},
+  {title:'信用卡的正确用法和致命红线',body:'信用卡是双刃剑：用好了是免费短期借款+积分福利，用错了是利滚利的债务陷阱。\n\n正确用法：①只刷自己能还的钱——把信用卡当借记卡用，当月消费金额不超过当月收入；②设置自动还款——绑定储蓄卡全额自动还款，永不错过还款日；③利用免息期——信用卡有20-50天免息期，这段时间相当于银行免费借钱给你用；④善用积分——加油/超市/外卖用对应的联名卡，积分换里程/话费/实物。\n\n致命红线：①最低还款——如果你只还最低还款额（通常10%），剩下的90%从消费日起按日息0.05%计息，年化利率约18%！这是银行最赚钱的产品；②取现——信用卡取现没有免息期，当天开始计息+手续费；③分期付款——"每月只要200元"听起来轻松，但实际年化利率常在12-15%，比你想象的高得多；④逾期——一次逾期记录留在征信报告上5年，影响你未来贷款买房。\n\n一句话：信用卡是用来省钱的（免息期+积分），不是用来花你还没挣到的钱的。',takeaway:'信用卡三大红线：不最低还款、不取现、不分期。设置自动全额还款，只刷自己能还的钱。'},
+  {title:'基金定投：普通人最适合的理财方式',body:'基金定投就是每月固定日期固定金额买入一只基金，不择时、不预测市场、靠时间积累。为什么适合普通人？因为你不需研究K线、不需判断底部、不需每天看盘——每月自动扣款，市场跌了自动买更多份额，市场涨了你的持仓也涨。\n\n选什么基金？新手从宽基指数基金开始：①沪深300指数——A股最大的300家公司，代表中国经济；②中证500指数——A股中等规模公司，成长性更强；③标普500指数（通过QDII基金购买）——美国最大的500家公司，全球资产配置。这三只覆盖了中国+美国的优质公司，足够分散。\n\n定投策略：①选好基金后就不要再换了，频繁换基=追涨杀跌；②市场大跌时（如跌了20%+），如果有闲钱可以加大定投金额——这时候买到的份额最多；③至少坚持3年，A股一轮牛熊约3-5年，坚持完一轮周期才能体现定投优势。\n\n⚠️ 不追热门基金！2020年白酒基金暴涨→大量人追高→2021年暴跌→割肉出局。定投的精髓是"傻傻地投"，不是"聪明地择时"。',takeaway:'选沪深300+中证500+标普500三只宽基指数，每月定投，坚持至少3年，不追热点不择时。'},
+  {title:'通货膨胀：为什么钱放手里会缩水',body:'通货膨胀简单说就是"钱越来越不值钱"。10年前一碗牛肉面15元，现在30元——这就是通胀。中国近年CPI（居民消费价格指数）约2-3%，意味着你手里的100元，一年后实际购买力只有97-98元。\n\n普通人如何对抗通胀？①存款——银行活期利率约0.2%，定期约1.5-2%，都跑不赢通胀。存银行=缓慢贬值；②货币基金——余额宝/零钱通约1.5-2%，勉强接近通胀，适合放应急金；③国债——3年期约2.5%，略高于通胀，安全性最高；④指数基金——长期年化约7-10%，显著跑赢通胀，但短期有波动，适合3年以上不用的钱；⑤房产——过去20年房价跑赢通胀，但未来不确定，且门槛高。\n\n对抗通胀的核心逻辑：把钱换成能增值的资产，而不是放手里。但注意——"对抗通胀"不等于"盲目投资"。如果为了跑赢通胀去炒币/P2P/高息理财，反而可能本金全无。稳健跑赢通胀的工具就两个：国债+指数基金。',takeaway:'活期存款跑不赢通胀，国债+指数基金是普通人最稳健的保值工具。别为了跑赢通胀去碰高风险产品。'},
+  {title:'资产 vs 负债：富人思维的第一课',body:'《富爸爸穷爸爸》里最核心的概念：资产是能把钱放进你口袋的东西，负债是把钱从你口袋拿走的东西。\n\n简单判断法：如果明天你失业了，这个东西是帮你赚钱还是让你花钱？帮你赚钱=资产（如出租房产、分红股票、指数基金）；让你花钱=负债（如自住房贷、车贷、信用卡分期）。\n\n普通人最常见的误区：①把自住房当资产——自住房不产生现金流，你每个月还要还房贷、交物业费，本质上更像负债（除非你出租部分）；②把车子当资产——车落地就贬值，每年保险+油费+保养是持续支出，是典型负债；③过度消费——用信用卡买新款手机/包包，分期付款，这是把未来的收入提前消耗。\n\n如何增加资产？①每月收入先拿出一部分（哪怕10%）买指数基金/货币基金；②学习一项能增加收入的技能（资产=你自己）；③减少不必要的负债——车能开就行、手机能用就行、衣服够穿就行。富人和穷人的区别不是收入高低，而是资产和负债的比例。',takeaway:'资产=帮你赚钱的东西，负债=让你花钱的东西。每月先存10%收入买资产，减少不必要负债。'},
+  {title:'理财第一课：记账——你花掉的每一笔钱都值得被看见',body:'记账是理财最基础的动作，但90%的人坚持不了一个月。不是因为懒，是因为方法错了。\n\n正确记账法：①不用每笔都记——先记3个月，找到"拿铁因子"（每天一杯咖啡、外卖配送费、各种会员订阅），这些小额支出累积起来可能占月支出的10-15%；②用App自动同步——支付宝/微信都有账单导出功能，每月导出一次做分类统计，不用手动记；③分类看占比——餐饮/住房/交通/购物/娱乐各占多少？餐饮>30%可能外卖太多、购物>20%可能冲动消费。\n\n记账的目的不是"限制消费"，而是"看见钱去了哪里"。大多数人记账3个月后，不用刻意省，自然就会少花10-20%——因为看见就自动约束了。这就是"觉察的力量"。\n\n记账工具推荐：微信/支付宝自带账单→每月底导出→用Excel做饼图。不需要复杂App，简单才能坚持。',takeaway:'记账3个月，你会自动少花10-20%。用微信/支付宝账单导出做分类统计，找"拿铁因子"。'}
+];
+const quoteDB=[
+  {text:'夫以铜为镜，可以正衣冠；以古为镜，可以知兴替；以人为镜，可以明得失。',source:'《旧唐书·魏徵传》',note:'唐太宗悼念魏徵时所言。读历史不是为了怀旧，是为了在别人的兴衰里找到自己决策的参照系。'},
+  {text:'兼听则明，偏信则暗。',source:'《资治通鉴·唐纪》',note:'司马光引魏徵语。做决策时，听一种声音等于蒙住一只眼——信息源越多元，判断越接近真相。'},
+  {text:'夫运筹策帷帐之中，决胜于千里之外，吾不如子房。镇国家，抚百姓，给馈饷，不绝粮道，吾不如萧何。连百万之军，战必胜，攻必取，吾不如韩信。此三者，皆人杰也，吾能用之，此吾所以取天下也。',source:'《史记·高祖本纪》',note:'刘邦自述成功秘诀。管理的最高境界不是自己多强，而是找到比你强的人并让他们为你所用。'},
+  {text:'见微以知萌，见端以知末。',source:'《韩非子·说林上》',note:'看到微小的苗头就知道事物的发展趋势。真正的风险管理不是应对危机，是在危机还在萌芽时就看到它。'},
+  {text:'天下熙熙，皆为利来；天下攘攘，皆为利往。',source:'《史记·货殖列传》',note:'司马迁两千年前就看清了商业的本质：所有商业行为归根到底是利益驱动。理解人性逐利，才能设计好的商业模式。'},
+  {text:'贵上极则反贱，贱下极则反贵。贵出如粪土，贱取如珠玉。',source:'《史记·货殖列传》',note:'范蠡（陶朱公）的经商心法。价格涨到顶就要跌，跌到底就要涨——这就是两千年前的"反周期操作"。高抛低吸，道理简单，做起来需要对抗人性。'},
+  {text:'人弃我取，人取我与。',source:'《史记·货殖列传》',note:'白圭的经商之道。当所有人都在抛售时你去买，当所有人都在抢购时你卖出。逆向思维是超额收益的来源，也是少数人能做的事。'},
+  {text:'故善战者，立于不败之地，而不失敌之败也。',source:'《孙子兵法·军形》',note:'先确保自己不输，再等待对手犯错。投资、创业、管理皆如此——风控是第一优先级，赢的前提是活下来。'},
+  {text:'知彼知己，百战不殆；不知彼而知己，一胜一负；不知彼不知己，每战必殆。',source:'《孙子兵法·谋攻》',note:'做任何事之前先评估两件事：对手（市场）在做什么，你自己有什么资源。信息不对称是最大的风险。'},
+  {text:'上兵伐谋，其次伐交，其次伐兵，其下攻城。',source:'《孙子兵法·谋攻》',note:'最高级的胜利是不战而胜。在商业中：最好的竞争不是打价格战（攻城），而是用策略和合作（伐谋伐交）让对手无法与你竞争。'},
+  {text:'无欲速，无见小利。欲速则不达，见小利则大事不成。',source:'《论语·子路》',note:'追求快速回报就看不到长期价值。创业、理财、学技能都如此——急功近利的人往往走不远。'},
+  {text:'君子和而不同，小人同而不和。',source:'《论语·子路》',note:'真正成熟的团队是"可以不同意但尊重彼此"（和而不同），而不是"表面一团和气背后各怀心思"（同而不和）。管理团队要警惕后者。'},
+  {text:'不谋万世者，不足谋一时；不谋全局者，不足谋一域。',source:'《寤言二·迁都建藩议》',note:'清人陈澹然的名句。做决策不能只看眼前、只盯局部——没有长期视角的短期决策，最终一定出问题。'},
+  {text:'利可共而不可独，谋可寡而不可众。',source:'曾国藩',note:'利益要分享才能聚人（独吞没人跟你干），但决策要少数人拍板（人多嘴杂做不成事）。利益分配 + 决策效率，是管理者最重要的两件事。'},
+  {text:'凡办大事，以识为主，以才为辅；凡成大事，人谋居半，天意居半。',source:'曾国藩',note:'做成大事 = 认知判断（识）占主导 + 执行能力（才）是辅助。另一半靠运气——承认运气的作用不是消极，是让你在失败时不苛责自己。'},
+  {text:'静水深流，人贵语迟。',source:'《礼记》意译',note:'真正有分量的话不需要抢着说。在谈判、会议、社交中，说得少而准的人，比说得快而多的人更有影响力。'}
+];
+
+window.addEventListener('load',init);
+if('serviceWorker' in navigator){navigator.serviceWorker.register('/sw.js').catch(()=>{});}
+</script>
+</body>
+</html>
