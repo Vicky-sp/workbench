@@ -67,6 +67,15 @@ header .date{font-size:11px;color:var(--sub);background:#221a33;border:1px solid
 .item-body li{margin-bottom:2px}
 .bullets{margin-top:6px;padding:6px 10px;background:#251d38;border-radius:10px;font-size:12px;color:var(--sub)}
 
+/* AI 资讯条 */
+.ai-bar{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:8px}
+.ai-status{font-size:11px;color:var(--sub);flex:1}
+.ai-status.ok{color:#4ade80}
+.ai-status.err{color:#f9a8d4}
+.ai-loading{text-align:center;padding:30px 10px;color:var(--sub);font-size:13px}
+.ai-loading .spin{display:inline-block;width:26px;height:26px;border:3px solid #3a2d55;border-top-color:#c084fc;border-radius:50%;animation:spin .8s linear infinite;margin-bottom:10px}
+@keyframes spin{to{transform:rotate(360deg)}}
+
 /* 健康 */
 .check-btn{display:inline-flex;align-items:center;gap:6px;padding:8px 14px;border-radius:20px;border:1px solid #3a2d55;background:#221a33;font-size:13px;cursor:pointer;color:#e8e2f5;box-shadow:0 2px 6px rgba(167,139,250,.08)}
 .check-btn.on{background:linear-gradient(135deg,#d8b4fe,#c084fc);color:#1a1428;border-color:transparent}
@@ -182,6 +191,7 @@ header h1{margin:0;font-size:18px;color:#a78bfa;letter-spacing:.5px;flex:1}
   <section class="panel" id="panel-home">
     <div class="panel-scroll"><div class="card">
       <div class="card-title"><span class="ci">🧼</span>家清情报 · 家居清洁赛道</div>
+      <div class="ai-bar"><span id="homeStatus" class="ai-status"></span><button class="btn sm" onclick="refreshNews('home')">🔄 更新</button></div>
       <div id="homeContent"></div>
     </div></div>
   </section>
@@ -190,6 +200,7 @@ header h1{margin:0;font-size:18px;color:#a78bfa;letter-spacing:.5px;flex:1}
   <section class="panel" id="panel-care">
     <div class="panel-scroll"><div class="card">
       <div class="card-title"><span class="ci">💄</span>个护情报 · 个人护理赛道</div>
+      <div class="ai-bar"><span id="careStatus" class="ai-status"></span><button class="btn sm" onclick="refreshNews('care')">🔄 更新</button></div>
       <div id="careContent"></div>
     </div></div>
   </section>
@@ -198,6 +209,7 @@ header h1{margin:0;font-size:18px;color:#a78bfa;letter-spacing:.5px;flex:1}
   <section class="panel" id="panel-fmc">
     <div class="panel-scroll"><div class="card">
       <div class="card-title"><span class="ci">🧴</span>快消情报 · 快速消费品赛道</div>
+      <div class="ai-bar"><span id="fmcStatus" class="ai-status"></span><button class="btn sm" onclick="refreshNews('fmc')">🔄 更新</button></div>
       <div id="fmcContent"></div>
     </div></div>
   </section>
@@ -206,6 +218,7 @@ header h1{margin:0;font-size:18px;color:#a78bfa;letter-spacing:.5px;flex:1}
   <section class="panel" id="panel-cross">
     <div class="panel-scroll"><div class="card">
       <div class="card-title"><span class="ci">✈️</span>跨境电商小白学习</div>
+      <div class="ai-bar"><span id="crossStatus" class="ai-status"></span><button class="btn sm" onclick="refreshLesson('cross')">🔄 更新</button></div>
       <div id="crossContent"></div>
     </div></div>
   </section>
@@ -256,6 +269,7 @@ header h1{margin:0;font-size:18px;color:#a78bfa;letter-spacing:.5px;flex:1}
   <section class="panel" id="panel-eng">
     <div class="panel-scroll"><div class="card">
       <div class="card-title"><span class="ci">🦋</span>英语口语碎片练习</div>
+      <div class="ai-bar"><span id="engStatus" class="ai-status"></span><button class="btn sm" onclick="refreshLesson('eng')">🔄 更新</button></div>
       <div id="engContent"></div>
       <div style="margin-top:10px"><button class="check-btn" id="engBtn" onclick="toggleEnglish()">🦋 今日英语打卡</button></div>
       <button class="btn ghost wide sm" style="margin-top:8px" onclick="showModal('histModal');setHistType('english');renderHist()">📊 英语打卡历史</button>
@@ -266,6 +280,7 @@ header h1{margin:0;font-size:18px;color:#a78bfa;letter-spacing:.5px;flex:1}
   <section class="panel" id="panel-fin">
     <div class="panel-scroll"><div class="card">
       <div class="card-title"><span class="ci">🐷</span>普通人财经知识</div>
+      <div class="ai-bar"><span id="finStatus" class="ai-status"></span><button class="btn sm" onclick="refreshLesson('fin')">🔄 更新</button></div>
       <div id="finContent"></div>
     </div></div>
   </section>
@@ -274,6 +289,7 @@ header h1{margin:0;font-size:18px;color:#a78bfa;letter-spacing:.5px;flex:1}
   <section class="panel" id="panel-quote">
     <div class="panel-scroll"><div class="card">
       <div class="card-title"><span class="ci">🌙</span>每日书摘</div>
+      <div class="ai-bar"><span id="quoteStatus" class="ai-status"></span><button class="btn sm" onclick="refreshLesson('quote')">🔄 更新</button></div>
       <div id="quoteContent"></div>
     </div></div>
   </section>
@@ -307,6 +323,7 @@ header h1{margin:0;font-size:18px;color:#a78bfa;letter-spacing:.5px;flex:1}
     <button class="sidebar-item" data-panel="eng" onclick="openFromSidebar('eng')"><span class="si">🦋</span>英语口语练习</button>
     <button class="sidebar-item" data-panel="fin" onclick="openFromSidebar('fin')"><span class="si">🐷</span>普通人财经知识</button>
     <button class="sidebar-item" data-panel="quote" onclick="openFromSidebar('quote')"><span class="si">🌙</span>每日书摘</button>
+    <button class="sidebar-item" onclick="aiSettings()"><span class="si">⚙️</span>AI设置</button>
   </div>
   <div class="sidebar-foot">点击模块进入查看 · 左上角 ☰ 打开</div>
 </aside>
@@ -537,41 +554,197 @@ function loadTodayRecipe(){
 
 /* ========== 英语 ========== */
 function renderEnglish(){
-  const idx=di(englishDB.length),items=[englishDB[idx],englishDB[(idx+1)%englishDB.length],englishDB[(idx+2)%englishDB.length]],t=tk();
-  document.getElementById('engContent').innerHTML=items.map((it,i)=>`<div class="eng-box"><div class="eng-en">${i+1}. ${esc(it.en)}</div><div class="eng-cn">${esc(it.cn)}</div><div class="eng-cn" style="margin-top:4px;font-size:11px">💡 ${esc(it.usage||'')}</div></div>`).join('')+'<div class="item-body" style="margin-top:8px">🎤 练习任务：任选一句，大声读5遍，录音听发音，再用自己的话造句。</div>';
+  const t=tk(),c=getNewsCache('eng');
+  if(c&&c.date===t){
+    document.getElementById('engContent').innerHTML=engHTML(c.data)+'<div class="item-body" style="margin-top:8px">🎤 练习任务：任选一句，大声读5遍，录音听发音，再用自己的话造句。</div>';
+    const st=document.getElementById('engStatus');st.textContent='✅ 今日已更新 · AI生成';st.className='ai-status ok';
+  }else{
+    const idx=di(englishDB.length),items=[englishDB[idx],englishDB[(idx+1)%englishDB.length],englishDB[(idx+2)%englishDB.length]];
+    document.getElementById('engContent').innerHTML=engHTML(items)+'<div class="item-body" style="margin-top:8px">🎤 练习任务：任选一句，大声读5遍，录音听发音，再用自己的话造句。</div>';
+    const st=document.getElementById('engStatus');
+    st.textContent=getAIKey()?'⚠️ 今日尚未生成，点「更新」生成新句子':'💡 点「更新」生成今日AI句子（首次需填API Key）';st.className='ai-status';
+  }
   document.getElementById('engBtn').classList.toggle('on',!!data.english[t]);
+}
+function engHTML(items){
+  return items.map((it,i)=>`<div class="eng-box"><div class="eng-en">${i+1}. ${esc(it.en)}</div><div class="eng-cn">${esc(it.cn)}</div><div class="eng-cn" style="margin-top:4px;font-size:11px">💡 ${esc(it.usage||'')}</div></div>`).join('');
 }
 function toggleEnglish(){const t=tk();data.english[t]=!data.english[t];sv(data);renderEnglish();}
 
-/* ========== 行业情报（家清/个护/快消）========== */
+/* ========== 行业情报（家清/个护/快消）· AI每日生成 ========== */
 const TAGS={new:'新规',risk:'⚠风险',tip:'💡实操',data:'📊数据',case:'🏆案例'};
-function renderNewsList(db,targetId){
-  const idx=di(db.length);
-  const items=[db[idx],db[(idx+1)%db.length],db[(idx+2)%db.length]];
-  document.getElementById(targetId).innerHTML=items.map(it=>{
-    return `<div class="info-item"><div class="item-title"><span class="tag ${it.tag}">${TAGS[it.tag]||it.tag}</span>${esc(it.title)}</div><div class="item-body">${esc(it.body)}</div>${it.bullets?`<div class="bullets">${it.bullets.map(b=>'• '+esc(b)).join('<br>')}</div>`:''}</div>`;
-  }).join('');
+
+// 各模块的 AI 提示词配置（统一驱动 7 个模块每日更新）
+const AI_MODULES={
+  home:{name:'家清（家居清洁）',kind:'news',
+    sys:'你是资深电商行业分析师，专注于家清（家居清洁）赛道。熟稔行业新规政策、爆品选品趋势、直播运营实操、平台动态。输出必须专业、具体、有可操作的数据和做法，不写空话套话。'},
+  care:{name:'个护（个人护理）',kind:'news',
+    sys:'你是资深电商行业分析师，专注于个护（个人护理）赛道。熟稔行业新规政策、爆品选品趋势、直播运营实操、平台动态。输出必须专业、具体、有可操作的数据和做法，不写空话套话。'},
+  fmc:{name:'快消（快速消费品）',kind:'news',
+    sys:'你是资深电商行业分析师，专注于快消（快速消费品）赛道。熟稔行业新规政策、爆品选品趋势、直播运营实操、平台动态。输出必须专业、具体、有可操作的数据和做法，不写空话套话。'},
+  cross:{name:'跨境电商',kind:'lesson',
+    sys:'你是跨境电商（Amazon/TikTok Shop/独立站）资深讲师，专门带零基础小白。讲解深入浅出、有具体步骤和避坑要点。'},
+  eng:{name:'英语口语',kind:'english',
+    sys:'你是英语口语教练，专为中国学习者设计"可立刻开口用"的地道表达，覆盖职场、生活、电商场景。'},
+  fin:{name:'财经知识',kind:'finance',
+    sys:'你是面向普通人的财经科普作者。用大白话讲清金融概念，强调风险与常识，绝不推荐具体投资标的。'},
+  quote:{name:'书摘',kind:'quote',
+    sys:'你精通中国历史典籍（资治通鉴、史记、论语、孙子兵法等）、财经著作与经管名著。能精准引用原文并做深刻解读，绝不写心灵鸡汤。'}
+};
+
+// 获取/设置 API Key + 缓存
+function getAIKey(){return localStorage.getItem('wb_ai_key')||''}
+function setAIKey(k){localStorage.setItem('wb_ai_key',k.trim())}
+function getNewsCache(mod){try{return JSON.parse(localStorage.getItem('wb_news_'+mod)||'null')}catch(e){return null}}
+
+// 通用：调用智谱 GLM 返回解析后的 JSON 对象
+async function callGLM(sys,prompt){
+  const key=getAIKey();
+  if(!key)throw new Error('NO_KEY');
+  const resp=await fetch('https://open.bigmodel.cn/api/paas/v4/chat/completions',{
+    method:'POST',
+    headers:{'Content-Type':'application/json','Authorization':'Bearer '+key},
+    body:JSON.stringify({model:'glm-4-flash',messages:[{role:'system',content:sys},{role:'user',content:prompt}],temperature:0.9,stream:false})
+  });
+  if(!resp.ok){const t=await resp.text();throw new Error('API '+resp.status+': '+t.slice(0,120));}
+  const j=await resp.json();
+  let txt=(j.choices&&j.choices[0]&&j.choices[0].message&&j.choices[0].message.content)||'';
+  txt=txt.replace(/```json/g,'').replace(/```/g,'').trim();
+  const s=txt.indexOf('{'),e=txt.lastIndexOf('}');
+  if(s>=0&&e>s)txt=txt.slice(s,e+1);
+  return JSON.parse(txt);
 }
-function renderHome(){renderNewsList(homeCleanDB,'homeContent');}
-function renderCare(){renderNewsList(personalCareDB,'careContent');}
-function renderFmc(){renderNewsList(fmcDB,'fmcContent');}
+
+// 各模块的生成提示词
+function buildPrompt(mod){
+  const t=tk();
+  if(mod==='home'||mod==='care'||mod==='fmc'){
+    const nm=AI_MODULES[mod].name;
+    return '今天是'+t+'。请生成'+nm+'赛道当日 3 条行业资讯。每条含 title（20字内）、tag（new/risk/tip/data/case 选一）、body（100-180字，含具体数据和实操建议）、bullets（3条要点短句）。覆盖：行业新规政策、爆品选品趋势、直播运营实操、平台动态。内容具体真实、贴近2025年电商行业。只输出JSON：{"items":[{"title":"","tag":"tip","body":"","bullets":["","",""]}]}';
+  }
+  if(mod==='cross'){
+    return '今天是'+t+'。为跨境电商零基础小白生成当日 1 课。含 title（课程标题）、body（正文150-250字，讲清一个具体知识点，有步骤）、tips（3-4条避坑指南）、task（1条今日小练习）。主题轮换于：选品、listing优化、广告投放、物流、收款、合规、TikTok Shop运营。只输出JSON：{"title":"","body":"","tips":["",""],"task":""}';
+  }
+  if(mod==='eng'){
+    return '今天是'+t+'。生成 3 条英语口语句子用于碎片练习。每条含 en（英文句子，地道实用）、cn（中文翻译）、usage（使用场景提示，15字内）。场景覆盖：职场沟通、日常社交、电商外贸。难度适中，适合成年人练习。只输出JSON：{"items":[{"en":"","cn":"","usage":""}]}';
+  }
+  if(mod==='fin'){
+    return '今天是'+t+'。为普通人生成 1 条财经科普。含 title（标题）、body（正文150-250字，用大白话讲清一个金融/理财概念或常识）、takeaway（一句话核心要点）。主题轮换于：复利、通胀、基金、保险、负债、记账、风险、资产配置等。只做科普，不推荐具体产品。只输出JSON：{"title":"","body":"","takeaway":""}';
+  }
+  if(mod==='quote'){
+    return '今天是'+t+'。从中国历史典籍（资治通鉴/史记/论语/孙子兵法等）或财经、经管名著中，选一段有深度的文字。含 text（原文片段，20-60字）、source（出处，如《资治通鉴·唐纪》）、note（80-150字解读，结合为人处世/管理/决策，深刻不鸡汤）。只输出JSON：{"text":"","source":"","note":""}';
+  }
+}
+
+// 从内置库取兜底
+function fallbackData(mod){
+  const idxMap={};
+  const pick=(db,n)=>{const i=di(db.length);return Array.from({length:n},(_,k)=>db[(i+k)%db.length])};
+  if(mod==='home')return pick(homeCleanDB,3);
+  if(mod==='care')return pick(personalCareDB,3);
+  if(mod==='fmc')return pick(fmcDB,3);
+  if(mod==='eng')return pick(englishDB,3);
+  if(mod==='cross'){const i=di(crossBorderDB.length);return crossBorderDB[i];}
+  if(mod==='fin'){const i=di(financeDB.length);return financeDB[i];}
+  if(mod==='quote'){const i=di(quoteDB.length);return quoteDB[i];}
+}
+
+// 资讯卡片 HTML
+function newsItemHTML(it){
+  const body=esc(it.body||'').replace(/\n/g,'<br>');
+  const bl=it.bullets&&it.bullets.length?`<div class="bullets">${it.bullets.map(b=>'• '+esc(b)).join('<br>')}</div>`:'';
+  return `<div class="info-item"><div class="item-title"><span class="tag ${it.tag}">${TAGS[it.tag]||it.tag||'资讯'}</span>${esc(it.title)}</div><div class="item-body">${body}</div>${bl}</div>`;
+}
+// 各模块渲染 HTML
+function contentHTML(mod,d){
+  if(mod==='home'||mod==='care'||mod==='fmc')return d.map(newsItemHTML).join('');
+  if(mod==='eng')return engHTML(d);
+  if(mod==='cross')return `<div class="info-item"><div class="item-title"><span class="tag kw">今日课程</span>${esc(d.title)}</div><div class="item-body">${esc(d.body).replace(/\n/g,'<br>')}</div>${d.tips?`<div class="bullets" style="margin-top:8px"><b>💡 避坑指南：</b><br>${d.tips.map(t=>'• '+esc(t)).join('<br>')}</div>`:''}<div style="margin-top:8px;font-size:12px;color:var(--primary)">📝 今日小任务：${esc(d.task||'用自己的话复述今天学到的核心概念')}</div></div>`;
+  if(mod==='fin')return `<div class="info-item"><div class="item-title">${esc(d.title)}</div><div class="item-body">${esc(d.body).replace(/\n/g,'<br>')}</div>${d.takeaway?`<div class="bullets" style="margin-top:8px">💡 ${esc(d.takeaway)}</div>`:''}<div style="font-size:11px;color:var(--sub);margin-top:8px">⚠️ 仅作财商科普，不构成任何投资建议。</div></div>`;
+  if(mod==='quote')return `<div class="quote">${esc(d.text)}</div><div class="quote-src">—— ${esc(d.source)}</div>${d.note?`<div style="font-size:12px;color:var(--sub);margin-top:8px;line-height:1.7">💭 ${esc(d.note)}</div>`:''}`;
+  return '';
+}
+// 各模块渲染入口
+const PANEL_MAP={
+  home:['homeContent','homeStatus'],care:['careContent','careStatus'],fmc:['fmcContent','fmcStatus'],
+  cross:['crossContent','crossStatus'],eng:['engContent','engStatus'],fin:['finContent','finStatus'],quote:['quoteContent','quoteStatus']
+};
+function renderModule(mod){
+  const [tid,sid]=PANEL_MAP[mod],t=tk(),c=getNewsCache(mod);
+  const extra=(mod==='eng'&&c&&c.date===t)?'<div class="item-body" style="margin-top:8px">🎤 练习任务：任选一句，大声读5遍，录音听发音，再用自己的话造句。</div>':'';
+  const st=document.getElementById(sid);
+  if(c&&c.date===t){
+    document.getElementById(tid).innerHTML=contentHTML(mod,c.data)+extra;
+    st.textContent='✅ 今日已更新 · AI生成';st.className='ai-status ok';
+  }else{
+    document.getElementById(tid).innerHTML=contentHTML(mod,fallbackData(mod))+extra;
+    st.textContent=getAIKey()?'⚠️ 今日尚未生成，点「更新」获取今日最新':'💡 点「更新」生成今日内容（首次需填API Key）';st.className='ai-status';
+  }
+}
+function renderHome(){renderModule('home');}function renderCare(){renderModule('care');}function renderFmc(){renderModule('fmc');}
+
 
 /* ========== 跨境 ========== */
-function renderCross(){
-  const idx=di(crossBorderDB.length),it=crossBorderDB[idx];
-  document.getElementById('crossContent').innerHTML=`<div class="info-item"><div class="item-title"><span class="tag kw">第 ${idx+1} 课</span>${esc(it.title)}</div><div class="item-body">${esc(it.body)}</div>${it.tips?`<div class="bullets" style="margin-top:8px"><b>💡 避坑指南：</b><br>${it.tips.map(t=>'• '+esc(t)).join('<br>')}</div>`:''}<div style="margin-top:8px;font-size:12px;color:var(--primary)">📝 今日小任务：${esc(it.task||'用自己的话复述今天学到的核心概念')}</div></div>`;
-}
+function renderCross(){renderModule('cross');}
 
 /* ========== 财经 ========== */
-function renderFin(){
-  const idx=di(financeDB.length),it=financeDB[idx];
-  document.getElementById('finContent').innerHTML=`<div class="info-item"><div class="item-title">${esc(it.title)}</div><div class="item-body">${esc(it.body)}</div>${it.takeaway?`<div class="bullets" style="margin-top:8px">💡 ${esc(it.takeaway)}</div>`:''}<div style="font-size:11px;color:var(--sub);margin-top:8px">⚠️ 仅作财商科普，不构成任何投资建议。</div></div>`;
-}
+function renderFin(){renderModule('fin');}
 
 /* ========== 书摘 ========== */
 function renderQuote(){
-  const idx=di(quoteDB.length),it=quoteDB[idx];
-  document.getElementById('quoteContent').innerHTML=`<div class="quote">${esc(it.text)}</div><div class="quote-src">—— ${esc(it.source)}</div>${it.note?`<div style="font-size:12px;color:var(--sub);margin-top:8px;line-height:1.7">💭 ${esc(it.note)}</div>`:''}`;
+  renderModule('quote');
+}
+
+/* ========== AI 生成 · 更新按钮 ========== */
+async function genModuleAI(mod){
+  const conf=AI_MODULES[mod];
+  const res=await callGLM(conf.sys,buildPrompt(mod));
+  if(conf.kind==='news'||conf.kind==='english'){
+    if(!res.items||!res.items.length)throw new Error('格式异常');
+    return res.items.slice(0,3);
+  }
+  return res;
+}
+async function refreshLesson(mod){
+  const [tid,sid]=PANEL_MAP[mod];
+  const st=document.getElementById(sid),dst=document.getElementById(tid);
+  if(!getAIKey()){
+    const k=prompt('首次使用请输入智谱 GLM 的 API Key\n（在 open.bigmodel.cn 控制台获取，只需填一次）');
+    if(!k)return;setAIKey(k);
+  }
+  st.textContent='⏳ 正在生成…';st.className='ai-status';
+  dst.innerHTML='<div class="ai-loading"><div class="spin"></div><br>AI 正在生成今日内容…</div>';
+  try{
+    const d=await genModuleAI(mod);
+    localStorage.setItem('wb_news_'+mod,JSON.stringify({date:tk(),source:'ai',data:d}));
+    const extra=(mod==='eng')?'<div class="item-body" style="margin-top:8px">🎤 练习任务：任选一句，大声读5遍，录音听发音，再用自己的话造句。</div>':'';
+    dst.innerHTML=contentHTML(mod,d)+extra;
+    st.textContent='✅ 今日已更新 · AI生成';st.className='ai-status ok';
+  }catch(e){
+    const extra=(mod==='eng')?'<div class="item-body" style="margin-top:8px">🎤 练习任务：任选一句，大声读5遍，录音听发音，再用自己的话造句。</div>':'';
+    dst.innerHTML=contentHTML(mod,fallbackData(mod))+extra;
+    if(e.message==='NO_KEY'){st.textContent='未填API Key';st.className='ai-status err';}
+    else if(/401|403|Unauthorized|invalid|令牌/i.test(e.message)){st.textContent='❌ API Key 无效，请重新输入';st.className='ai-status err';localStorage.removeItem('wb_ai_key');}
+    else{st.textContent='❌ 生成失败（已显示内置内容）：'+e.message.slice(0,60);st.className='ai-status err';}
+  }
+}
+const refreshNews=refreshLesson; // 兼容旧调用
+
+// 每天首次打开自动生成（静默，仅当有Key且今天没缓存）
+async function autoGenDaily(){
+  if(!getAIKey())return;
+  const all=['home','care','fmc','cross','eng','fin','quote'];
+  // 生成完一个就刷新对应模块
+  for(const mod of all){
+    const c=getNewsCache(mod);
+    if(c&&c.date===tk())continue;
+    try{
+      const d=await genModuleAI(mod);
+      localStorage.setItem('wb_news_'+mod,JSON.stringify({date:tk(),source:'ai',data:d}));
+      if(curPanel===mod||PANEL_MAP[curPanel]&&mod==='home'&&curPanel==='home')renderModule(mod);
+    }catch(e){}
+  }
+  if(PANEL_MAP[curPanel])renderModule(curPanel);
 }
 
 /* ========== 日记 ========== */
@@ -628,6 +801,21 @@ function init(){
   const h=now.getHours();let g='早上好';if(h>=12)g='下午好';if(h>=18)g='晚上好';
   document.getElementById('greet').textContent=`${g}呀～ 🖤 今日待办先过一遍叭 👇`;
   switchPanel('task');
+  // 每天首次打开，后台静默生成今日资讯
+  setTimeout(autoGenDaily,1500);
+}
+
+/* ========== AI 设置 ========== */
+function aiSettings(){
+  const cur=getAIKey();
+  const msg='当前 API Key：'+(cur?cur.slice(0,8)+'****'+cur.slice(-4):'（未设置）')+
+    '\n\n请输入智谱 GLM 的 API Key：\n（在 open.bigmodel.cn 控制台 → API密钥 获取）\n留空并确定 = 清除已保存的 Key';
+  const k=prompt(msg,cur?'':cur);
+  if(k===null)return;               // 取消
+  if(k.trim()===''){localStorage.removeItem('wb_ai_key');alert('已清除 API Key');return;}
+  setAIKey(k);
+  ['home','care','fmc','cross','eng','fin','quote'].forEach(m=>localStorage.removeItem('wb_news_'+m));
+  alert('✅ API Key 已保存！\n下次打开工作台会自动生成全部模块的今日内容，也可点各模块「更新」按钮手动生成。');
 }
 
 /* ========== 内容库 ========== */
